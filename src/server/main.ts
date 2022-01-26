@@ -83,8 +83,8 @@ const server = startServer();
 
 const app = express();
 
-//If there is no host header (really there always should be..) then use client-api as the name
-app.use(xrayExpress.openSegment('client-api'));
+//If there is no host header (really there always should be..) then use admin-api as the name
+app.use(xrayExpress.openSegment('admin-api'));
 
 //Set XRay to use the host header to open its segment name.
 AWSXRay.middleware.enableDynamicNaming('*');

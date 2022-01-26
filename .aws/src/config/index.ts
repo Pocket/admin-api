@@ -1,5 +1,5 @@
-const name = 'ClientAPI';
-const domainPrefix = 'client-api';
+const name = 'AdminAPI';
+const domainPrefix = 'admin-api';
 const isDev = process.env.NODE_ENV === 'development';
 const environment = isDev ? 'Dev' : 'Prod';
 const domain = isDev
@@ -33,7 +33,7 @@ export const config = {
   isProd,
   prefix: `${name}-${environment}`,
   circleCIPrefix: `/${name}/CircleCI/${environment}`,
-  shortName: 'CAPI',
+  shortName: 'AAPI',
   environment,
   domain,
   cacheNodes,
@@ -41,7 +41,7 @@ export const config = {
   isDev,
   codePipeline: {
     githubConnectionArn,
-    repository: 'pocket/client-api',
+    repository: 'pocket/admin-api',
     branch
   },
   tags: {
@@ -51,7 +51,7 @@ export const config = {
   healthCheck: {
     command: [
       'CMD-SHELL',
-      'curl -f http://localhost:4001/.well-known/apollo/server-health || exit 1',
+      'curl -f http://localhost:4027/.well-known/apollo/server-health || exit 1',
     ],
     interval: 15,
     retries: 3,
@@ -60,13 +60,8 @@ export const config = {
   },
   envVars: {
     graph: {
-      graphId: 'pocket-client-api',
+      graphId: 'pocket-admin-api',
       graphVariant: graphqlVariant
-    },
-    auth: {
-      jwtIssuer: 'getpocket.com',
-      kids: 'PK11T,8p1t74',
-      defaultKid: 'PK11T'
     }
   }
 };

@@ -23,7 +23,7 @@ import { PagerdutyProvider } from '@cdktf/provider-pagerduty';
 import { LocalProvider } from '@cdktf/provider-local';
 import { NullProvider } from '@cdktf/provider-null';
 
-class ClientAPI extends TerraformStack {
+class AdminAPI extends TerraformStack {
   constructor(scope: Construct, name: string) {
     super(scope, name);
 
@@ -45,7 +45,6 @@ class ClientAPI extends TerraformStack {
       pagerDuty: this.createPagerDuty(),
       secretsManagerKmsAlias: this.getSecretsManagerKmsAlias(),
       snsTopic: this.getCodeDeploySnsTopic(),
-      nodeList: this.createElasticache(),
       region,
       caller
     });
@@ -115,10 +114,10 @@ class ClientAPI extends TerraformStack {
       prefix: config.prefix,
       service: {
         criticalEscalationPolicyId: incidentManagement.get(
-          'policy_backend_critical_id'
+          'policy_backend_product_critical_id'
         ),
         nonCriticalEscalationPolicyId: incidentManagement.get(
-          'policy_backend_non_critical_id'
+          'policy_backend_product_non_critical_id'
         )
       }
     });
@@ -130,46 +129,29 @@ class ClientAPI extends TerraformStack {
     caller: DataAwsCallerIdentity;
     secretsManagerKmsAlias: DataAwsKmsAlias;
     snsTopic: DataAwsSnsTopic;
-    nodeList: string[];
   }): PocketALBApplication {
-    const { pagerDuty, region, caller, secretsManagerKmsAlias, snsTopic, nodeList } =
+    const { pagerDuty, region, caller, secretsManagerKmsAlias, snsTopic } =
       dependencies;
 
     return new PocketALBApplication(this, 'application', {
-      internal: false,
+      internal: true, // change to false when we move out of the VPC
       prefix: config.prefix,
       alb6CharacterPrefix: config.shortName,
       tags: config.tags,
-      cdn: true,
+      cdn: false,
       domain: config.domain,
       containerConfigs: [
         {
           name: 'app',
           portMappings: [{
-            hostPort: 4000,
-            containerPort: 4000,
+            hostPort: 4027,
+            containerPort: 4027,
             protocol: 'tcp'
           }],
           envVars: [
             {
               name: 'ENVIRONMENT',
               value: process.env.NODE_ENV // this gives us a nice lowercase production and development
-            },
-            {
-              name: 'MEMCACHED_SERVERS',
-              value: nodeList.join(','),
-            },
-            {
-              name: 'JWT_ISSUER',
-              value: config.envVars.auth.jwtIssuer
-            },
-            {
-              name: 'KIDS',
-              value: config.envVars.auth.kids
-            },
-            {
-              name: 'DEFAULT_KID',
-              value: config.envVars.auth.defaultKid
             },
             {
               name: 'APOLLO_GRAPH_REF',
@@ -189,7 +171,7 @@ class ClientAPI extends TerraformStack {
           healthCheck: {
             command: [
               'CMD-SHELL',
-              'curl -f http://localhost:4000/.well-known/apollo/server-health || exit 1'
+              'curl -f http://localhost:4027/.well-known/apollo/server-health || exit 1'
             ],
             interval: 15,
             retries: 3,
@@ -216,7 +198,7 @@ class ClientAPI extends TerraformStack {
       },
       exposedContainer: {
         name: 'app',
-        port: 4000,
+        port: 4027,
         healthCheckPath: '/.well-known/apollo/server-health'
       },
       ecsIamConfig: {
@@ -282,48 +264,8 @@ class ClientAPI extends TerraformStack {
       },
     });
   }
-
-
-  /**
-   * Creates the elasticache and returns the node address list
-   * @param scope
-   * @private
-   */
-  private createElasticache(): string[] {
-    const pocketVPC = new PocketVPC(this, 'pocket-vpc');
-
-    const elasticache = new ApplicationMemcache(this, 'memcached', {
-      //Usually we would set the security group ids of the service that needs to hit this.
-      //However we don't have the necessary security group because it gets created in PocketALBApplication
-      //So instead we set it to null and allow anything within the vpc to access it.
-      //This is not ideal..
-      //Ideally we need to be able to add security groups to the ALB application.
-      allowedIngressSecurityGroupIds: undefined,
-      node: {
-        count: config.cacheNodes,
-        size: config.cacheSize
-      },
-      subnetIds: pocketVPC.privateSubnetIds,
-      tags: config.tags,
-      vpcId: pocketVPC.vpc.id,
-      prefix: config.prefix
-    });
-
-    let nodeList: string[] = [];
-    for (let i = 0; i < config.cacheNodes; i++) {
-      // ${elasticache.elasticacheClister.cacheNodes(i.toString()).port} has a bug and is not rendering the proper terraform address
-      // its rendering -1.8881545897087503e+289 for some weird reason...
-      // For now we just hardcode to 11211 which is the default memcache port.
-      nodeList.push(
-        `${
-          elasticache.elasticacheCluster.cacheNodes(i.toString()).address
-        }:11211`
-      );
-    }
-    return nodeList;
-  }
 }
 
 const app = new App();
-new ClientAPI(app, 'client-api');
+new AdminAPI(app, 'admin-api');
 app.synth();

@@ -1,4 +1,4 @@
-# Client API
+# Admin API
 
 To get the federated schema for this service from the [Apollo Studio](https://studio.apollographql.com/), you need an API key.
 You can Obtain an API key from https://engine.apollographql.com/user-settings. 
@@ -33,7 +33,7 @@ All requests through this gateway will now resolve to the local subgraph service
   - The easiest way to get around this is to flush the cache with `echo 'flush_all' | nc localhost 11211`
   - Restarting the memcache container also works to flush the cache
 
-## Client API Schema/Naming Conventions
+## Admin API Schema/Naming Conventions
 
 The general principles guiding these are:
 * What are GraphQl's own recommendations (Looking at http://spec.graphql.org/)
