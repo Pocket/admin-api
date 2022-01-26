@@ -28,6 +28,9 @@ export async function getAppContext(
 
   const context: IContext = { token: token, publicKeys: publicKeys };
 
+  /*
+  We'll customize this later!
+  
   //OH boy! we have an authorization header, lets pull out our JWT and validate it.
   if (token) {
     context.token = token.split(' ')[1];
@@ -53,6 +56,7 @@ export async function getAppContext(
     ] as string,
     language: req.headers['web-request-language'] as string,
   };
+  */
 
   return context;
 }

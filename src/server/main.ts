@@ -43,26 +43,8 @@ async function startServer() {
     // Enable schema introspection so that GraphQL Codegen can generate types
     // that are used by Apollo Client in frontend apps
     introspection: true,
-    // Caches the queries that apollo clients can send via a hashed get request
-    // This allows us to cache resolver decisions
-    persistedQueries: {
-      cache: memcached,
-      ttl: 300, // 5 minutes
-    },
-    //The cache that Apollo should use for all of its responses
-    //https://www.apollographql.com/docs/apollo-server/data/data-sources/#using-memcachedredis-as-a-cache-storage-backend
-    //This will only be used if all data in the response is cacheable
-    //However because up above we set cacheControl to default of 5 this is always cached for at least 5 seconds
-    //This will add the CDN cache control headers to the response and will cache it in memcached if its cacheable
-    cache: memcached,
     context: contextFactory,
     plugins: [
-      //Copied from Apollo docs, the sessionID signifies if we should separate out caches by user.
-      responseCachePlugin({
-        //https://www.apollographql.com/docs/apollo-server/performance/caching/#saving-full-responses-to-a-cache
-        sessionId: (requestContext: GraphQLRequestContext) =>
-          requestContext.context.pocketUser?.userId ?? null,
-      }),
       sentryPlugin,
       process.env.NODE_ENV === 'production'
         ? ApolloServerPluginLandingPageDisabled()

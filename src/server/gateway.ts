@@ -21,6 +21,9 @@ let options: GatewayConfig = {
         request: GraphQLRequest;
         context: IContext;
       }) {
+      /*
+        AUTH CODE WILL GO HERE EVENTUALLY 
+
         const { token, pocketUser, webRequest, forwardHeaders } = context;
         // Pass along any headers that should be forwarded to the subgraphs
         addRecordToRequestHeader(forwardHeaders, request);
@@ -40,6 +43,8 @@ let options: GatewayConfig = {
         if (webRequest) {
           buildRequestHeadersFromWebRequest(request, webRequest);
         }
+
+      */
       },
     });
   },
