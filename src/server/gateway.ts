@@ -1,6 +1,7 @@
 import { GatewayConfig } from '@apollo/gateway';
 import { GraphQLRequest } from 'apollo-server-types';
-import { ApolloGateway, RemoteGraphQLDataSource } from '@apollo/gateway';
+import { ApolloGateway } from '@apollo/gateway';
+import FileUploadDataSource from '@profusion/apollo-federation-upload';
 import config from './../config';
 import { IContext } from './context';
 import {
@@ -12,8 +13,10 @@ import { readFileSync } from 'fs';
 
 let options: GatewayConfig = {
   buildService({ url }) {
-    return new RemoteGraphQLDataSource({
+    // FileUploadDataSource extends RemoteGraphQLDataSource from @apollo/gateway
+    return new FileUploadDataSource({
       url,
+      useChunkedTransfer: true,
       willSendRequest({
         request,
         context,
@@ -21,7 +24,7 @@ let options: GatewayConfig = {
         request: GraphQLRequest;
         context: IContext;
       }) {
-      /*
+        /*
         AUTH CODE WILL GO HERE EVENTUALLY 
 
         const { token, pocketUser, webRequest, forwardHeaders } = context;
