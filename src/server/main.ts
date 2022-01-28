@@ -16,6 +16,7 @@ import {
 } from 'apollo-server-core';
 import { sentryPlugin } from '@pocket-tools/apollo-utils';
 import { GraphQLRequestContext } from 'apollo-server-plugin-base';
+import { graphqlUploadExpress } from 'graphql-upload';
 
 //Set XRAY to just log if the context is missing instead of a runtime error
 AWSXRay.setContextMissingStrategy('LOG_ERROR');
@@ -64,6 +65,14 @@ const server = startServer();
 // Pass the ApolloGateway to the ApolloServer constructor
 
 const app = express();
+
+// enable file uploads!
+app.use(
+  graphqlUploadExpress({
+    maxFileSize: config.app.upload.maxSize,
+    maxFiles: config.app.upload.maxFiles,
+  })
+);
 
 //If there is no host header (really there always should be..) then use admin-api as the name
 app.use(xrayExpress.openSegment('admin-api'));

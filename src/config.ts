@@ -1,6 +1,12 @@
 import { MemcachedCache } from 'apollo-server-cache-memcached';
 
 const config = {
+  app: {
+    upload: {
+      maxSize: 10000000,
+      maxFiles: 10,
+    },
+  },
   memcached: {
     servers: process.env.MEMCACHED_SERVERS
       ? process.env.MEMCACHED_SERVERS.split(',')
