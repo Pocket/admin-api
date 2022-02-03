@@ -23,9 +23,15 @@ const config = {
   },
   isDev: process.env.NODE_ENV === 'development',
   auth: {
-    jwtIssuer: process.env.JWT_ISSUER || 'getpocket.com',
-    kids: process.env.KIDS?.split(',') || ['PK11T', '8p1t74'],
-    defaultKid: process.env.DEFAULT_KID || 'PK11T',
+    jwtIssuer:
+      process.env.JWT_ISSUER ||
+      'cognito-idp.us-east-1.amazonaws.com/us-east-1_1alKls4qw',
+    kids: process.env.KIDS?.split(',') || [
+      'kze4M0CiXoDO7Qkpig1oH0F6OInzZg6ugk0PyojOlzc=',
+      '4w35mrh4EBECpjJnyIjdQ60yjh3xeI1m0VF1H/z0T/c=',
+    ],
+    defaultKid:
+      process.env.DEFAULT_KID || 'kze4M0CiXoDO7Qkpig1oH0F6OInzZg6ugk0PyojOlzc=',
   },
 };
 

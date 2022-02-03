@@ -1,19 +1,13 @@
 import {
+  AdminAPIUser,
   getSigningKeysFromServer,
-  PocketUser,
-  validateAndGetPocketUser,
+  validateAndGetAdminAPIUser,
 } from '../jwtUtils';
 import { extractHeader } from './requestHelpers';
 export type IContext = {
   publicKeys?: Record<string, string>;
   token?: string;
-  pocketUser?: PocketUser;
-  webRequest?: {
-    language?: string;
-    ipAddress?: string;
-    snowplowDomainUserId?: string;
-    userAgent?: string;
-  };
+  adminAPIUser?: AdminAPIUser;
   forwardHeaders?: {
     'origin-client-ip': string;
   };
@@ -26,16 +20,13 @@ export async function getAppContext(
   //See if we have an authorization header
   const token = req.headers.authorization ?? null;
 
-  const context: IContext = { token: token, publicKeys: publicKeys };
+  const context: IContext = { token, publicKeys };
 
-  /*
-  We'll customize this later!
-  
   //OH boy! we have an authorization header, lets pull out our JWT and validate it.
   if (token) {
     context.token = token.split(' ')[1];
     //AHH we have a user. Lets put it in our request to use elsewhere.
-    context.pocketUser = await validateAndGetPocketUser(
+    context.adminAPIUser = await validateAndGetAdminAPIUser(
       context.token,
       publicKeys
     );
@@ -46,17 +37,6 @@ export async function getAppContext(
     // if x-forwarded-for is an array
     'origin-client-ip': extractHeader(req.headers['x-forwarded-for']),
   };
-
-  // let's add web repo request headers to the context
-  context.webRequest = {
-    userAgent: req.headers['web-request-user-agent'] as string,
-    ipAddress: req.headers['web-request-ip-address'] as string,
-    snowplowDomainUserId: req.headers[
-      'web-request-snowplow-domain-user-id'
-    ] as string,
-    language: req.headers['web-request-language'] as string,
-  };
-  */
 
   return context;
 }

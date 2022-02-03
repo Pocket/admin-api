@@ -1,13 +1,11 @@
 import {
   addRecordToRequestHeader,
-  buildRequestHeadersFromPocketUser,
-  buildRequestHeadersFromWebRequest,
+  buildRequestHeadersFromAdminAPIUser,
   extractHeader,
 } from './requestHelpers';
 import { GraphQLRequest } from 'apollo-server-types';
 import { Headers } from 'apollo-server-env';
-import { PocketUser } from '../jwtUtils';
-import { IContext } from './context';
+import { AdminAPIUser } from '../jwtUtils';
 
 describe('request helpers', () => {
   let request: GraphQLRequest;
@@ -22,41 +20,24 @@ describe('request helpers', () => {
     };
   });
 
-  it("adds the pocket user's properties and values as headers in a request", () => {
-    const pocketUser: PocketUser = {
-      userId: '1',
-      email: 'test@email.com',
+  it("adds the Admin API user's properties and values as headers in a request", () => {
+    const adminAPIUser: AdminAPIUser = {
+      name: 'John Carr',
+      username: 'ad|john.b.carr',
+      groups: ['group1', 'group2'],
     };
 
-    const subgraphRequest = buildRequestHeadersFromPocketUser(
+    const subgraphRequest = buildRequestHeadersFromAdminAPIUser(
       request,
-      pocketUser
+      adminAPIUser
     );
 
     const headers = subgraphRequest.http.headers;
-    expect(headers.get('userId')).toEqual('1');
-    expect(headers.get('email')).toEqual('test@email.com');
+    expect(headers.get('name')).toEqual('John Carr');
+    expect(headers.get('username')).toEqual('ad|john.b.carr');
+    expect(headers.get('groups')).toEqual('group1,group2');
   });
 
-  it('adds web repo specific headers to a request', () => {
-    const webRequest: IContext['webRequest'] = {
-      userAgent: 'Test;This;Not;That',
-      ipAddress: '1.2.3.4',
-      language: 'en',
-      snowplowDomainUserId: 'sn1ow',
-    };
-
-    const subgraphRequest = buildRequestHeadersFromWebRequest(
-      request,
-      webRequest
-    );
-
-    const headers = subgraphRequest.http.headers;
-    expect(headers.get('gatewayUserAgent')).toEqual('Test;This;Not;That');
-    expect(headers.get('gatewayIpAddress')).toEqual('1.2.3.4');
-    expect(headers.get('gatewaySnowplowDomainUserId')).toEqual('sn1ow');
-    expect(headers.get('gatewayLanguage')).toEqual('en');
-  });
   it('copies arbitrary key-value strings to request headers', () => {
     const arbitraryObject = {
       ice: 'cannon',
@@ -68,6 +49,7 @@ describe('request helpers', () => {
     expect(request.http.headers.get('tShirt')).toEqual('cube');
     expect(request.http.headers.get('x-forwarded-for')).toEqual('myip');
   });
+
   it('extracts first value from string array, or returns the string', () => {
     const someFakeHeaders = {
       yeet: 'yoink',
