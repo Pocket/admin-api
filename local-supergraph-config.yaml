@@ -6,18 +6,21 @@ subgraphs:
     # schema defines the introspection endpoint - usually the same, but it could be different
     schema:
       subgraph_url: https://parser-graphql-wrapper.getpocket.dev/
-  # TODO: set up prospect api for federation!
-  #prospect-api: 
-  #  routing_url: https://prospect-api.getpocket.dev/
-    # schema defines the introspection endpoint - usually the same, but it could be different
-  #  schema:
-  #    subgraph_url: https://prospect-api.getpocket.dev/
-  # Uncomment/Add your subgraphs here to run locally
-  # parser:
-  #   routing_url: http://localhost:4001
-  #   schema:
-  #     subgraph_url: http://localhost:4001
-  # user-api:
-  #   routing_url: http://localhost:4006
-  #   schema:
-  #     subgraph_url: http://localhost:4006
+
+  # See local setup instructions at https://github.com/Pocket/collection-api
+#  collection-api:
+#    routing_url: http://localhost:4004/admin
+#    schema:
+#      subgraph_url: http://localhost:4004/admin
+
+  # See local setup instructions at https://github.com/Pocket/prospect-api
+#  prospect-api:
+#    routing_url: http://localhost:4026/
+#    schema:
+#      subgraph_url: http://localhost:4026/
+
+  # See local setup instructions at https://github.com/Pocket/curated-corpus-api/
+#  curated-corpus-api:
+#    routing_url: http://localhost:4025/admin
+#    schema:
+#      subgraph_url: http://localhost:4025/admin
