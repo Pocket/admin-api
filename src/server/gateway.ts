@@ -5,8 +5,7 @@ import FileUploadDataSource from '@profusion/apollo-federation-upload';
 import config from './../config';
 import { IContext } from './context';
 import {
-  buildRequestHeadersFromPocketUser,
-  buildRequestHeadersFromWebRequest,
+  buildRequestHeadersFromAdminAPIUser,
   addRecordToRequestHeader,
 } from './requestHelpers';
 import { readFileSync } from 'fs';
@@ -24,10 +23,7 @@ let options: GatewayConfig = {
         request: GraphQLRequest;
         context: IContext;
       }) {
-        /*
-        AUTH CODE WILL GO HERE EVENTUALLY 
-
-        const { token, pocketUser, webRequest, forwardHeaders } = context;
+        const { token, adminAPIUser, forwardHeaders } = context;
         // Pass along any headers that should be forwarded to the subgraphs
         addRecordToRequestHeader(forwardHeaders, request);
 
@@ -36,18 +32,12 @@ let options: GatewayConfig = {
           request.http.headers.set('jwt', token);
         }
 
-        if (pocketUser) {
-          // We have a decoded JWT at context.pocketUser.. Let's pass down the individual properties as headers.
+        if (adminAPIUser) {
+          // We have a decoded JWT at context.adminAPIUser. Let's pass down the individual properties as headers.
           // OPEN_QUESTION: is this secure? should downstream have to verify their JWT?
           // All subgraph are currently in a VPC so we can trust the headers that are sent down by the gateway
-          buildRequestHeadersFromPocketUser(request, pocketUser);
+          buildRequestHeadersFromAdminAPIUser(request, adminAPIUser);
         }
-
-        if (webRequest) {
-          buildRequestHeadersFromWebRequest(request, webRequest);
-        }
-
-      */
       },
     });
   },

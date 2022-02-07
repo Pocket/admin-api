@@ -1,6 +1,5 @@
 import { GraphQLRequest } from 'apollo-server-types';
-import { IContext } from './context';
-import { PocketUser } from '../jwtUtils';
+import { AdminAPIUser } from '../jwtUtils';
 
 /**
  * Extract first value from an http header. If array, first
@@ -28,45 +27,21 @@ export function addRecordToRequestHeader(
 }
 
 /**
- * Add pocket user properties to request header
+ * Add AdminAPIUser properties to request header.
  * The data added here are extracted from the JWT header
- * coming from the web repo
+ * coming from AWS Cognito.
  * @param request
  * @param user
  */
-export function buildRequestHeadersFromPocketUser(
+export function buildRequestHeadersFromAdminAPIUser(
   request: GraphQLRequest,
-  user: PocketUser
+  user: AdminAPIUser
 ): GraphQLRequest {
   for (const property in user) {
-    if (user.hasOwnProperty(property)) {
+    if (Object.prototype.hasOwnProperty.call(user, property)) {
       request.http.headers.set(property, user[property]);
     }
   }
-
-  return request;
-}
-
-/**
- * These are additional request headers sent from the web repo.
- * Subgraphs use these headers coming for the original user
- * request to send accurate request context for analytics.
- * TODO: This will no longer be need once clients are able to make
- * requests directly to this gateway service.
- * @param request
- * @param webRequest
- */
-export function buildRequestHeadersFromWebRequest(
-  request: GraphQLRequest,
-  webRequest: IContext['webRequest']
-): GraphQLRequest {
-  request.http.headers.set('gatewayLanguage', webRequest.language);
-  request.http.headers.set('gatewayIpAddress', webRequest.ipAddress);
-  request.http.headers.set(
-    'gatewaySnowplowDomainUserId',
-    webRequest.snowplowDomainUserId
-  );
-  request.http.headers.set('gatewayUserAgent', webRequest.userAgent);
 
   return request;
 }

@@ -1,5 +1,3 @@
-//Bits and pieces have been taken from https://github.com/Pocket/feature-flags/blob/master/src/jwtAuth.ts as the reference
-
 import jwt, {
   JsonWebTokenError,
   NotBeforeError,
@@ -11,46 +9,53 @@ import config from './config';
 import Sentry from '@sentry/node';
 
 /**
- * Represents a generic object for use with JWTs
+ * The properties of the SSO Mozilla user coming through via AWS Cognito.
  */
-interface genericObject {
-  [key: string]: any;
+export interface CognitoUser {
+  given_name: string;
+  family_name: string;
+  name: string;
+  email: string;
+  'cognito:groups': string[];
+  'cognito:username': string;
+  'custom:groups': string;
+  groups: string[];
+  picture: string;
+  exp: number;
+  iat: number;
+  email_verified: string;
 }
 
 /**
- * Represents a pocket user from getpocket.com jwt token
- * All fields are optional because the getpocket.com may or may not have the info depending on the request made
+ * The properties of the SSO Mozilla user that we care about enough to pass on
+ * to the subgraphs (`name` is needed for `created_by` and `updated_by` fields
+ * in Curated Corpus API, for example, and Cognito groups are needed to figure
+ * out privileges across the internal tools).
  */
-export interface PocketUser {
-  premium?: boolean;
-  encodedId?: string;
-  roles?: string[];
-  consumerKey?: string;
-  apiId?: string;
-  applicationName?: string;
-  applicationIsTrusted?: boolean;
-  applicationIsNative?: boolean;
-  userId?: string;
-  email?: string;
-  guid?: string;
-  encodedGuid?: string;
+export interface AdminAPIUser {
+  name: string;
+  // note these come from the value of `cognito:groups`, not `groups` in CognitoUser
+  groups: string[];
+  // same here: value comes from `cognito:username`.
+  username: string;
 }
 
 /**
- * Validates and decodes a JWT into a pocket user
+ * Validates and decodes a JWT into an AdminAPIUser object that will be passed on
+ * in the headers to the subgraphs.
  * If validation fails this will error to the client and not return a response
  * This is expected because if a JWT is passed to use then it needs to validate
  * @param rawJwtToken
- * @param publicKey
+ * @param publicKeys
  */
-export const validateAndGetPocketUser = async (
+export const validateAndGetAdminAPIUser = async (
   rawJwtToken: string,
   publicKeys: Record<string, string>
-): Promise<PocketUser> => {
+): Promise<AdminAPIUser> => {
   const decoded = decodeDataJwt(rawJwtToken);
   if (!decoded.payload.iss) {
     throw new AuthenticationError(
-      'The JWT has no issuer defined, unabled to verify'
+      'The JWT has no issuer defined, unable to verify'
     );
   }
   try {
@@ -75,7 +80,15 @@ export const validateAndGetPocketUser = async (
     }
   }
 
-  return buildPocketUser(decoded);
+  return buildAdminAPIUserFromPayload(decoded.payload as CognitoUser);
+};
+
+const buildAdminAPIUserFromPayload = (payload: CognitoUser): AdminAPIUser => {
+  return {
+    name: payload.name,
+    groups: payload['cognito:groups'],
+    username: payload['cognito:username'],
+  };
 };
 
 //Set the SIGNING key ttl to 1 week.
@@ -89,8 +102,7 @@ const SIGNING_KEY_TTL = 60 * 60 * 24 * 7;
 export const getSigningKeysFromServer = async (): Promise<
   Record<string, string>
 > => {
-  // https://getpocket.com/.well-known/jwk
-  const jwksUri = `https://${config.auth.jwtIssuer}/.well-known/jwk`;
+  const jwksUri = `https://${config.auth.jwtIssuer}/.well-known/jwks.json`;
   const client = jwksClient({
     jwksUri,
     cache: true, // Default Value
@@ -132,41 +144,7 @@ const decodeDataJwt = (rawJwt: string): jwt.Jwt => {
   });
 
   if (!decoded) {
-    throw new AuthenticationError('Could not decode jwt');
+    throw new AuthenticationError('Could not decode JWT');
   }
   return decoded;
-};
-
-/**
- * Given a decoded JWT build out the pocket user
- * @param decoded
- */
-const buildPocketUser = (decoded: genericObject): PocketUser => {
-  const { payload } = decoded;
-  return {
-    // Indicates whether the user is a premium user
-    premium: payload.premium,
-    // The user identifier
-    userId: payload.sub,
-    // The encoded user identifier
-    encodedId: payload.encoded_id,
-    // The roles assigned to the user
-    roles: payload.roles,
-    // API key used by applications to access Pocket's API
-    consumerKey: payload.consumer_key,
-    // An identifier for the the API user. This forms the prefix of the consumer key
-    apiId: payload.api_id,
-    // The name of the API user ex Android app
-    applicationName: payload.application_name,
-    // Indicates whether the API user is native i.e. internally assigned within Pocket
-    applicationIsNative: payload.application_is_native,
-    // Indicates whether the API user is trusted i.e. we are confident actions by this user represents real user actions
-    applicationIsTrusted: payload.application_is_trusted,
-    // A guid that is used to connect the user's logged out events to logged in events. Primarily used for analytics
-    guid: payload.guid,
-    // The encoded guid
-    encodedGuid: payload.encoded_guid,
-    // The user email
-    email: payload.email,
-  };
 };
