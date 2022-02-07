@@ -1,6 +1,5 @@
 import { ApolloServer } from 'apollo-server-express';
-import config, { memcached } from '../config';
-import responseCachePlugin from 'apollo-server-plugin-response-cache';
+import config from '../config';
 import AWSXRay from 'aws-xray-sdk-core';
 import xrayExpress from 'aws-xray-sdk-express';
 import express from 'express';
@@ -8,14 +7,12 @@ import https from 'https';
 import { contextFactory } from './context';
 import { getAppGateway } from './gateway';
 import * as Sentry from '@sentry/node';
-import { errorHandler } from '@pocket-tools/apollo-utils';
 import {
   ApolloServerPluginCacheControl,
   ApolloServerPluginLandingPageDisabled,
   ApolloServerPluginLandingPageGraphQLPlayground,
 } from 'apollo-server-core';
 import { sentryPlugin } from '@pocket-tools/apollo-utils';
-import { GraphQLRequestContext } from 'apollo-server-plugin-base';
 import { graphqlUploadExpress } from 'graphql-upload';
 
 //Set XRAY to just log if the context is missing instead of a runtime error
