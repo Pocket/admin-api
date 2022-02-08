@@ -34,7 +34,7 @@ export interface CognitoUser {
  */
 export interface AdminAPIUser {
   name: string;
-  // note these come from the value of `cognito:groups`, not `groups` in CognitoUser
+  // note these come from the value of `custom:groups`, not `cognito:groups` in CognitoUser
   groups: string[];
   // same here: value comes from `cognito:username`.
   username: string;
@@ -86,7 +86,7 @@ export const validateAndGetAdminAPIUser = async (
 const buildAdminAPIUserFromPayload = (payload: CognitoUser): AdminAPIUser => {
   return {
     name: payload.name,
-    groups: payload['cognito:groups'],
+    groups: JSON.parse(payload['custom:groups']),
     username: payload['cognito:username'],
   };
 };
