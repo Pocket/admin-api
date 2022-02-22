@@ -9,6 +9,13 @@ import config from './config';
 import Sentry from '@sentry/node';
 
 /**
+ * Properties of the identity property in CognitoUser below
+ */
+export interface CoginitoUserIdentity {
+  userId: string;
+}
+
+/**
  * The properties of the SSO Mozilla user coming through via AWS Cognito.
  */
 export interface CognitoUser {
@@ -24,6 +31,7 @@ export interface CognitoUser {
   exp: number;
   iat: number;
   email_verified: string;
+  identities: CoginitoUserIdentity[];
 }
 
 /**
@@ -36,7 +44,7 @@ export interface AdminAPIUser {
   name: string;
   // note these come from the value of `custom:groups`, not `cognito:groups` in CognitoUser
   groups: string[];
-  // same here: value comes from `cognito:username`.
+  // this value comes from `identities.userId`
   username: string;
 }
 
@@ -83,11 +91,20 @@ export const validateAndGetAdminAPIUser = async (
   return buildAdminAPIUserFromPayload(decoded.payload as CognitoUser);
 };
 
-const buildAdminAPIUserFromPayload = (payload: CognitoUser): AdminAPIUser => {
+export const buildAdminAPIUserFromPayload = (
+  payload: CognitoUser
+): AdminAPIUser => {
+  // the identities array should always have an entry
+  const identity = payload.identities[0];
+
+  if (!identity) {
+    throw new Error(`JWT payload missing identity information`);
+  }
+
   return {
     name: payload.name,
     groups: JSON.parse(payload['custom:groups']),
-    username: payload['cognito:username'],
+    username: identity.userId,
   };
 };
 
@@ -146,5 +163,6 @@ const decodeDataJwt = (rawJwt: string): jwt.Jwt => {
   if (!decoded) {
     throw new AuthenticationError('Could not decode JWT');
   }
+
   return decoded;
 };
