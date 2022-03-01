@@ -37,7 +37,7 @@
     "graphql-tag": "^2.11.0",
     "graphql-upload": "^13.0.0",
     "jsonwebtoken": "^8.5.1",
-    "jwks-rsa": "^1.12.2",
+    "jwks-rsa": "^2.0.5",
     "node-fetch": "^2.6.1",
     "qs": "^6.9.4"
   },
