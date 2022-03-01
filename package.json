@@ -44,7 +44,7 @@
   "devDependencies": {
     "@types/chai": "^4.2.14",
     "@types/deep-equal-in-any-order": "1.0.1",
-    "@types/jest": "^26.0.15",
+    "@types/jest": "^27.4.1",
     "@types/jsonwebtoken": "^8.5.0",
     "@types/node": "^16.9.1",
     "@types/sinon": "10.0.10",
