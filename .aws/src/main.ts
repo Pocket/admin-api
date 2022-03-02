@@ -3,21 +3,22 @@ import {
   App,
   DataTerraformRemoteState,
   RemoteBackend,
-  TerraformStack
+  TerraformStack,
 } from 'cdktf';
 import {
   AwsProvider,
   DataAwsCallerIdentity,
   DataAwsKmsAlias,
   DataAwsRegion,
-  DataAwsSnsTopic
+  DataAwsSnsTopic,
 } from '@cdktf/provider-aws';
 import { config } from './config';
 import {
   ApplicationMemcache,
   PocketALBApplication,
   PocketVPC,
-  PocketPagerDuty, PocketECSCodePipeline
+  PocketPagerDuty,
+  PocketECSCodePipeline,
 } from '@pocket-tools/terraform-modules';
 import { PagerdutyProvider } from '@cdktf/provider-pagerduty';
 import { LocalProvider } from '@cdktf/provider-local';
@@ -35,7 +36,7 @@ class AdminAPI extends TerraformStack {
     new RemoteBackend(this, {
       hostname: 'app.terraform.io',
       organization: 'Pocket',
-      workspaces: [{ prefix: `${config.name}-` }]
+      workspaces: [{ prefix: `${config.name}-` }],
     });
 
     const region = new DataAwsRegion(this, 'region');
@@ -46,11 +47,10 @@ class AdminAPI extends TerraformStack {
       secretsManagerKmsAlias: this.getSecretsManagerKmsAlias(),
       snsTopic: this.getCodeDeploySnsTopic(),
       region,
-      caller
+      caller,
     });
     this.createApplicationCodePipeline(pocketApp);
   }
-
 
   /**
    * Get the sns topic for code deploy
@@ -58,7 +58,7 @@ class AdminAPI extends TerraformStack {
    */
   private getCodeDeploySnsTopic() {
     return new DataAwsSnsTopic(this, 'backend_notifications', {
-      name: `Backend-${config.environment}-ChatBot`
+      name: `Backend-${config.environment}-ChatBot`,
     });
   }
 
@@ -68,7 +68,7 @@ class AdminAPI extends TerraformStack {
    */
   private getSecretsManagerKmsAlias() {
     return new DataAwsKmsAlias(this, 'kms_alias', {
-      name: 'alias/aws/secretsmanager'
+      name: 'alias/aws/secretsmanager',
     });
   }
 
@@ -83,8 +83,8 @@ class AdminAPI extends TerraformStack {
       source: {
         codeStarConnectionArn: config.codePipeline.githubConnectionArn,
         repository: config.codePipeline.repository,
-        branchName: config.codePipeline.branch
-      }
+        branchName: config.codePipeline.branch,
+      },
     });
   }
 
@@ -98,15 +98,14 @@ class AdminAPI extends TerraformStack {
       return null;
     }
 
-
     const incidentManagement = new DataTerraformRemoteState(
       this,
       'incident_management',
       {
         organization: 'Pocket',
         workspaces: {
-          name: 'incident-management'
-        }
+          name: 'incident-management',
+        },
       }
     );
 
@@ -118,8 +117,8 @@ class AdminAPI extends TerraformStack {
         ),
         nonCriticalEscalationPolicyId: incidentManagement.get(
           'policy_backend_product_non_critical_id'
-        )
-      }
+        ),
+      },
     });
   }
 
@@ -134,7 +133,7 @@ class AdminAPI extends TerraformStack {
       dependencies;
 
     return new PocketALBApplication(this, 'application', {
-      internal: true, // change to false when we move out of the VPC
+      internal: false, //set to true to put it inside our vpc
       prefix: config.prefix,
       alb6CharacterPrefix: config.shortName,
       tags: config.tags,
@@ -143,63 +142,67 @@ class AdminAPI extends TerraformStack {
       containerConfigs: [
         {
           name: 'app',
-          portMappings: [{
-            hostPort: 4027,
-            containerPort: 4027,
-            protocol: 'tcp'
-          }],
+          portMappings: [
+            {
+              hostPort: 4027,
+              containerPort: 4027,
+              protocol: 'tcp',
+            },
+          ],
           envVars: [
             {
               name: 'ENVIRONMENT',
-              value: process.env.NODE_ENV // this gives us a nice lowercase production and development
+              value: process.env.NODE_ENV, // this gives us a nice lowercase production and development
             },
             {
               name: 'APOLLO_GRAPH_REF',
-              value: `${config.envVars.graph.graphId}@${config.envVars.graph.graphVariant}`
-            }
+              value: `${config.envVars.graph.graphId}@${config.envVars.graph.graphVariant}`,
+            },
           ],
           secretEnvVars: [
             {
               name: 'SENTRY_DSN',
-              valueFrom: `arn:aws:ssm:${region.name}:${caller.accountId}:parameter/${config.name}/${config.environment}/SENTRY_DSN`
+              valueFrom: `arn:aws:ssm:${region.name}:${caller.accountId}:parameter/${config.name}/${config.environment}/SENTRY_DSN`,
             },
             {
               name: 'APOLLO_KEY',
-              valueFrom: `arn:aws:ssm:${region.name}:${caller.accountId}:parameter/${config.name}/${config.environment}/APOLLO_KEY`
-            }
+              valueFrom: `arn:aws:ssm:${region.name}:${caller.accountId}:parameter/${config.name}/${config.environment}/APOLLO_KEY`,
+            },
           ],
           healthCheck: {
             command: [
               'CMD-SHELL',
-              'curl -f http://localhost:4027/.well-known/apollo/server-health || exit 1'
+              'curl -f http://localhost:4027/.well-known/apollo/server-health || exit 1',
             ],
             interval: 15,
             retries: 3,
             timeout: 5,
-            startPeriod: 0
-          }
+            startPeriod: 0,
+          },
         },
         {
           name: 'xray-daemon',
           containerImage: 'amazon/aws-xray-daemon',
           repositoryCredentialsParam: `arn:aws:secretsmanager:${region.name}:${caller.accountId}:secret:Shared/DockerHub`,
-          portMappings: [{
-            hostPort: 2000,
-            containerPort: 2000,
-            protocol: 'udp'
-          }],
-          command: ['--region', 'us-east-1', '--local-mode']
-        }
+          portMappings: [
+            {
+              hostPort: 2000,
+              containerPort: 2000,
+              protocol: 'udp',
+            },
+          ],
+          command: ['--region', 'us-east-1', '--local-mode'],
+        },
       ],
       codeDeploy: {
         useCodeDeploy: true,
         useCodePipeline: true,
-        snsNotificationTopicArn: snsTopic.arn
+        snsNotificationTopicArn: snsTopic.arn,
       },
       exposedContainer: {
         name: 'app',
         port: 4027,
-        healthCheckPath: '/.well-known/apollo/server-health'
+        healthCheckPath: '/.well-known/apollo/server-health',
       },
       ecsIamConfig: {
         prefix: config.prefix,
@@ -210,19 +213,19 @@ class AdminAPI extends TerraformStack {
             resources: [
               `arn:aws:secretsmanager:${region.name}:${caller.accountId}:secret:Shared`,
               `arn:aws:secretsmanager:${region.name}:${caller.accountId}:secret:Shared/*`,
-              secretsManagerKmsAlias.targetKeyArn
+              secretsManagerKmsAlias.targetKeyArn,
             ],
-            effect: 'Allow'
+            effect: 'Allow',
           },
           //This policy could probably go in the shared module in the future.
           {
             actions: ['ssm:GetParameter*'],
             resources: [
               `arn:aws:ssm:${region.name}:${caller.accountId}:parameter/${config.name}/${config.environment}`,
-              `arn:aws:ssm:${region.name}:${caller.accountId}:parameter/${config.name}/${config.environment}/*`
+              `arn:aws:ssm:${region.name}:${caller.accountId}:parameter/${config.name}/${config.environment}/*`,
             ],
-            effect: 'Allow'
-          }
+            effect: 'Allow',
+          },
         ],
         taskRolePolicyStatements: [
           {
@@ -231,18 +234,18 @@ class AdminAPI extends TerraformStack {
               'xray:PutTelemetryRecords',
               'xray:GetSamplingRules',
               'xray:GetSamplingTargets',
-              'xray:GetSamplingStatisticSummaries'
+              'xray:GetSamplingStatisticSummaries',
             ],
             resources: ['*'],
-            effect: 'Allow'
-          }
+            effect: 'Allow',
+          },
         ],
         taskExecutionDefaultAttachmentArn:
-          'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+          'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy',
       },
       autoscalingConfig: {
         targetMinCapacity: 2,
-        targetMaxCapacity: 10
+        targetMaxCapacity: 10,
       },
       alarms: {
         http5xxErrorPercentage: {
@@ -258,8 +261,10 @@ class AdminAPI extends TerraformStack {
           // for 4 continuous evaluation period for 1 hour (15 mins per period)
           evaluationPeriods: 4,
           threshold: 500,
-          period: 900,//in seconds, 15 mins per period
-          actions: config.isProd ? [pagerDuty.snsNonCriticalAlarmTopic.arn] : [],
+          period: 900, //in seconds, 15 mins per period
+          actions: config.isProd
+            ? [pagerDuty.snsNonCriticalAlarmTopic.arn]
+            : [],
         },
       },
     });
