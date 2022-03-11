@@ -1,0 +1,48 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: admin-api
+  description: ECS Service that is the gateway to all of Pocket's Admin GraphQL APIs.
+  annotations:
+    github.com/project-slug: pocket/admin-api
+    circleci.com/project-slug: github/Pocket/admin-api
+    github.com/team-slug: Pocket/backend
+    sentry.io/project-slug: admin-api
+  links:
+    - url: https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#dashboards:name=AdminAPI-Prod-ALBDashboard
+      title: Amazon Cloudwatch
+      icon: dashboard
+    - url: https://console.aws.amazon.com/ecs/v2/clusters/AdminAPI-Prod/services?region=us-east-1
+      title: Amazon ECS Fargate
+      icon: dashboard
+    - url: https://console.aws.amazon.com/codesuite/codepipeline/pipelines/AdminAPI-Prod-CodePipeline/view?region=us-east-1
+      title: Amazon CodePipeline
+      icon: dashboard
+spec:
+  type: service
+  owner: backend
+  lifecycle: production
+  providesApis:
+    - admin-api
+  consumesApis:
+    - parser-graphql-wrapper
+    - collections-api
+    - curated-corpus-api
+
+---
+
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: admin-api
+  description: External facing GraphQL API for Pocket Admin Tools
+  links:
+    - url: https://studio.apollographql.com/graph/pocket-admin-api/home?variant=current
+      title: Apollo Studio
+      icon: dashboard
+spec:
+  type: graphql
+  owner: backend
+  lifecycle: production
+  definition: |
+    # Required field. Will find way to sync this eventually or use apollo studio.
