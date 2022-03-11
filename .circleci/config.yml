@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   aws-ecs: circleci/aws-ecs@2.0.0
-  pocket: pocket/circleci-orbs@1.2.0
+  pocket: pocket/circleci-orbs@1.2.5
 
 # Workflow shortcuts
 not_main: &not_main
@@ -39,7 +39,7 @@ only_dev: &only_dev
 jobs:
   build:
     docker:
-      - image: circleci/node:16
+      - image: circleci/node:16@sha256:1803e9ed7deec9456ad2609124b7333d40b2eec0cf34998ae766cbf90c9a3625
     steps:
       - checkout
       # Define the working directory for this job
@@ -80,7 +80,7 @@ jobs:
   test_specs:
     description: Run spec tests
     docker:
-      - image: circleci/node:16
+      - image: circleci/node:16@sha256:1803e9ed7deec9456ad2609124b7333d40b2eec0cf34998ae766cbf90c9a3625
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
