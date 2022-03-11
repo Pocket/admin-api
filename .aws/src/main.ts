@@ -7,16 +7,13 @@ import {
 } from 'cdktf';
 import {
   AwsProvider,
-  DataAwsCallerIdentity,
-  DataAwsKmsAlias,
-  DataAwsRegion,
-  DataAwsSnsTopic,
+  datasources,
+  kms,
+  sns
 } from '@cdktf/provider-aws';
 import { config } from './config';
 import {
-  ApplicationMemcache,
   PocketALBApplication,
-  PocketVPC,
   PocketPagerDuty,
   PocketECSCodePipeline,
 } from '@pocket-tools/terraform-modules';
@@ -39,8 +36,8 @@ class AdminAPI extends TerraformStack {
       workspaces: [{ prefix: `${config.name}-` }],
     });
 
-    const region = new DataAwsRegion(this, 'region');
-    const caller = new DataAwsCallerIdentity(this, 'caller');
+    const region = new datasources.DataAwsRegion(this, 'region');
+    const caller = new datasources.DataAwsCallerIdentity(this, 'caller');
 
     const pocketApp = this.createPocketAlbApplication({
       pagerDuty: this.createPagerDuty(),
@@ -57,7 +54,7 @@ class AdminAPI extends TerraformStack {
    * @private
    */
   private getCodeDeploySnsTopic() {
-    return new DataAwsSnsTopic(this, 'backend_notifications', {
+    return new sns.DataAwsSnsTopic(this, 'backend_notifications', {
       name: `Backend-${config.environment}-ChatBot`,
     });
   }
@@ -67,7 +64,7 @@ class AdminAPI extends TerraformStack {
    * @private
    */
   private getSecretsManagerKmsAlias() {
-    return new DataAwsKmsAlias(this, 'kms_alias', {
+    return new kms.DataAwsKmsAlias(this, 'kms_alias', {
       name: 'alias/aws/secretsmanager',
     });
   }
@@ -114,20 +111,20 @@ class AdminAPI extends TerraformStack {
       service: {
         criticalEscalationPolicyId: incidentManagement.get(
           'policy_backend_product_critical_id'
-        ),
+        ).toString(),
         nonCriticalEscalationPolicyId: incidentManagement.get(
           'policy_backend_product_non_critical_id'
-        ),
+        ).toString(),
       },
     });
   }
 
   private createPocketAlbApplication(dependencies: {
     pagerDuty?: PocketPagerDuty;
-    region: DataAwsRegion;
-    caller: DataAwsCallerIdentity;
-    secretsManagerKmsAlias: DataAwsKmsAlias;
-    snsTopic: DataAwsSnsTopic;
+    region: datasources.DataAwsRegion;
+    caller: datasources.DataAwsCallerIdentity;
+    secretsManagerKmsAlias: kms.DataAwsKmsAlias;
+    snsTopic: sns.DataAwsSnsTopic;
   }): PocketALBApplication {
     const { pagerDuty, region, caller, secretsManagerKmsAlias, snsTopic } =
       dependencies;
