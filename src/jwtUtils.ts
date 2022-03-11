@@ -1,7 +1,7 @@
 import jwt, {
-  JsonWebTokenError,
+  JsonWebTokenError, JwtPayload,
   NotBeforeError,
-  TokenExpiredError,
+  TokenExpiredError
 } from 'jsonwebtoken';
 import jwksClient from 'jwks-rsa';
 import { AuthenticationError } from 'apollo-server-errors';
@@ -61,7 +61,10 @@ export const validateAndGetAdminAPIUser = async (
   publicKeys: Record<string, string>
 ): Promise<AdminAPIUser> => {
   const decoded = decodeDataJwt(rawJwtToken);
-  if (!decoded.payload.iss) {
+  // Type for payload is a JwtPayload or a string which breaks the if statement,
+  // so we cast to a JwtPayload which it is already.
+  const payload = decoded.payload as JwtPayload;
+  if (!payload.iss) {
     throw new AuthenticationError(
       'The JWT has no issuer defined, unable to verify'
     );
