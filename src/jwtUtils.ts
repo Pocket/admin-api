@@ -1,7 +1,8 @@
 import jwt, {
-  JsonWebTokenError, JwtPayload,
+  JsonWebTokenError,
+  JwtPayload,
   NotBeforeError,
-  TokenExpiredError
+  TokenExpiredError,
 } from 'jsonwebtoken';
 import jwksClient from 'jwks-rsa';
 import { AuthenticationError } from 'apollo-server-errors';
