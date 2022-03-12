@@ -117,23 +117,48 @@ export const buildAdminAPIUserFromPayload = (
 const SIGNING_KEY_TTL = 60 * 60 * 24 * 7;
 
 /**
+ * Creates a jwks client
+ * @param jwksUri
+ */
+function getJwksClient(jwksUri: string) {
+  return jwksClient({
+    jwksUri,
+    cache: true, // Default Value
+    cacheMaxEntries: 5, // Default value
+    cacheMaxAge: SIGNING_KEY_TTL,
+  });
+}
+
+/**
+ * Get JWKs from cognito
+ */
+function getCognitoJwks() {
+  const jwksUri = `https://${config.auth.cognito.jwtIssuer}/.well-known/jwks.json`;
+  const client = getJwksClient(jwksUri);
+  return config.auth.cognito.kids.map((kid: string) =>
+    client.getSigningKeyAsync(kid)
+  );
+}
+
+/**
+ * Get JWKs from Pocket
+ */
+function getPocketJwks() {
+  const jwksUri = `https://${config.auth.pocket.jwtIssuer}/.well-known/jwk`;
+  const client = getJwksClient(jwksUri);
+  return config.auth.pocket.kids.map((kid: string) =>
+    client.getSigningKeyAsync(kid)
+  );
+}
+
+/**
  * Gets the signing key from the issuer server
  * @returns Record of public key string by kid.
  */
 export const getSigningKeysFromServer = async (): Promise<
   Record<string, string>
 > => {
-  const jwksUri = `https://${config.auth.jwtIssuer}/.well-known/jwks.json`;
-  const client = jwksClient({
-    jwksUri,
-    cache: true, // Default Value
-    cacheMaxEntries: 5, // Default value
-    cacheMaxAge: SIGNING_KEY_TTL,
-  });
-
-  const keys = await Promise.all(
-    config.auth.kids.map((kid: string) => client.getSigningKeyAsync(kid))
-  );
+  const keys = await Promise.all([...getCognitoJwks(), ...getPocketJwks()]);
 
   const publicKeyStringRecords: Record<string, string> = keys.reduce(
     (acc: Record<string, string>, key: jwksClient.SigningKey) => {
