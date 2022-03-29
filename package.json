@@ -27,7 +27,7 @@
     "apollo-server": "3.6.4",
     "apollo-server-cache-memcached": "3.3.1",
     "apollo-server-express": "3.6.4",
-    "apollo-server-plugin-base": "3.5.1",
+    "apollo-server-plugin-base": "3.5.2",
     "apollo-server-plugin-response-cache": "3.5.1",
     "aws-xray-sdk-core": "3.3.4",
     "aws-xray-sdk-express": "3.3.4",
