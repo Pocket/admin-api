@@ -1,6 +1,6 @@
 version: "3.8"
 services:
   memcached:
-    image: memcached:latest@sha256:8cb02ff55eac1f98150d990ce0e762a901e4d38175b2e6cd55bf5a3af7ffa72b
+    image: memcached:latest@sha256:7d9f43781f7d560e8307cb30dd9129f110747916791c98975b130d0acf017ffa
     ports:
     - 11212:11211
