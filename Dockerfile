@@ -1,4 +1,4 @@
-FROM node:16@sha256:ffe804d6fcced29bcfc3477de079d03a9c2b0e4917e44bfeafb1a6b0f875e383
+FROM node:16@sha256:62b256c1b30587cdfdfdb10879de6e08ed240c1d5c0ffa190e764d7155cb0ab1
 
 ARG GIT_SHA
 
