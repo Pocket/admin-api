@@ -42,7 +42,7 @@ export const config = {
   codePipeline: {
     githubConnectionArn,
     repository: 'pocket/admin-api',
-    branch
+    branch,
   },
   tags: {
     service: name,
@@ -61,7 +61,7 @@ export const config = {
   envVars: {
     graph: {
       graphId: 'pocket-admin-api',
-      graphVariant: graphqlVariant
-    }
-  }
+      graphVariant: graphqlVariant,
+    },
+  },
 };
