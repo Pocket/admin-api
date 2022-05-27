@@ -54,11 +54,10 @@
     "lodash": "^4.17.21",
     "nock": "13.2.4",
     "nodemon": "2.0.16",
-    "sinon": "14.0.0",x
-    "ts-jest": "28.0.2",x
-    "ts-node": "10.7.0"x
-    "prettier": "2.5.1",x
-    "typescript": "4.6.4"x
-
+    "sinon": "14.0.0",
+    "ts-jest": "28.0.2",
+    "ts-node": "10.7.0",
+    "prettier": "2.5.1",
+    "typescript": "4.6.4"
   }
 }
