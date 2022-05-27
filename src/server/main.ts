@@ -53,6 +53,7 @@ async function startServer() {
         defaultMaxAge: config.apollo.defaultMaxAge,
       }),
     ],
+    csrfPrevention: true,
   });
   await server.start();
   return server;
