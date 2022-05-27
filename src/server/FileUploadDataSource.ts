@@ -28,9 +28,67 @@ export type FileUploadDataSourceArgs = ConstructorArgs & {
   useChunkedTransfer?: boolean;
 };
 
+const addChunkedDataToForm: AddDataHandler = (
+  form: FormData,
+  resolvedFiles: FileUpload[]
+): Promise<void> => {
+  resolvedFiles.forEach(
+    ({ createReadStream, filename, mimetype: contentType }, i: number) => {
+      form.append(i.toString(), createReadStream(), {
+        contentType,
+        filename,
+        /*
+            Set knownLength to NaN so node-fetch does not set the
+            Content-Length header and properly set the enconding
+            to chunked.
+            https://github.com/form-data/form-data/pull/397#issuecomment-471976669
+          */
+        knownLength: Number.NaN,
+      });
+    }
+  );
+  return Promise.resolve();
+};
+
+const addDataToForm: AddDataHandler = (
+  form: FormData,
+  resolvedFiles: FileUpload[]
+): Promise<void[]> => {
+  return Promise.all(
+    resolvedFiles.map(
+      async (
+        { createReadStream, filename, mimetype: contentType },
+        i: number
+      ): Promise<void> => {
+        const fileData = await new Promise<Buffer>((resolve, reject) => {
+          const stream = createReadStream();
+          const buffers: Buffer[] = [];
+          stream.on('error', reject);
+          stream.on('data', (data: Buffer) => {
+            buffers.push(data);
+          });
+          stream.on('end', () => {
+            resolve(Buffer.concat(buffers));
+          });
+        });
+        form.append(i.toString(), fileData, {
+          contentType,
+          filename,
+          knownLength: fileData.length,
+        });
+      }
+    )
+  );
+};
+
 export default class FileUploadDataSource extends ProfusionFileUploadDataSource {
   constructor(config?: FileUploadDataSourceArgs) {
     super(config);
+
+    const useChunkedTransfer = config?.useChunkedTransfer ?? true;
+    this.customAddDataHandler = useChunkedTransfer
+      ? addChunkedDataToForm
+      : addDataToForm;
   }
 
   private customAddDataHandler: AddDataHandler;
