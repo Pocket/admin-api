@@ -29,7 +29,10 @@
     "apollo-server-plugin-response-cache": "3.5.3",
     "aws-xray-sdk-core": "3.3.5",
     "aws-xray-sdk-express": "3.3.5",
-    "deep-equal-in-any-order": "1.1.18",
+    "deep-equal-in-any-order": "1.1.19",
+    "graphql": "15.8.0",
+    "graphql-anywhere": "4.2.7",
+    "graphql-tag": "2.12.6",
     "graphql-upload": "13.0.0",
     "jsonwebtoken": "8.5.1",
     "jwks-rsa": "1.12.3",
@@ -44,15 +47,18 @@
     "@types/jest": "27.5.1",
     "@types/jsonwebtoken": "8.5.8",
     "@types/lodash": "^4.14.182",
-    "@types/node": "16.11.35",
+    "@types/node": "16.11.36",
     "@types/sinon": "10.0.11",
     "chai": "4.3.6",
     "jest": "28.1.0",
     "lodash": "^4.17.21",
     "nock": "13.2.4",
     "nodemon": "2.0.16",
-    "sinon": "14.0.0",
-    "ts-jest": "28.0.2",
-    "ts-node": "10.7.0"
+    "sinon": "14.0.0",x
+    "ts-jest": "28.0.2",x
+    "ts-node": "10.7.0"x
+    "prettier": "2.5.1",x
+    "typescript": "4.6.4"x
+
   }
 }
