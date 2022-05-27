@@ -12,6 +12,10 @@ import { Request } from 'node-fetch';
 import FormData from './FormData';
 import ProfusionFileUploadDataSource from '@profusion/apollo-federation-upload';
 
+/**
+ * These types and functions below are copied from the library as well.
+ * Since they're not class members and aren't exported, I had to copy them
+ */
 type FileVariablesTuple = [string, Promise<FileUpload>];
 type Variables = Record<string, unknown> | null;
 type AddDataHandler = (
@@ -81,6 +85,14 @@ const addDataToForm: AddDataHandler = (
   );
 };
 
+/**
+ * This class is extending the FileUploadDataSource class from the @profusion/apollo-federation-upload package
+ * The reason we are doing this is because this library's current version is not compatible with federation 2.0.
+ * The image uploads are broken. However, there is a fix that has been approved for this library but hasn't been merged.
+ * Since that stops us from using `csrfPrevention`, we have decided to temporarily extend the library's class and implement the change
+ * that hasn't been officially merged into library's main branch.
+ */
+
 export default class FileUploadDataSource extends ProfusionFileUploadDataSource {
   constructor(config?: FileUploadDataSourceArgs) {
     super(config);
@@ -91,8 +103,10 @@ export default class FileUploadDataSource extends ProfusionFileUploadDataSource 
       : addDataToForm;
   }
 
+  // re-initializing this because it's a private member in the base class so can't override it
   private customAddDataHandler: AddDataHandler;
 
+  // re-initializing this because it's a private member in the base class so can't override it
   private static customExtractFileVariables(
     rootVariables?: Variables
   ): FileVariablesTuple[] {
@@ -159,6 +173,7 @@ export default class FileUploadDataSource extends ProfusionFileUploadDataSource 
     return super.process(args);
   }
 
+  // re-initializing this because it's a private member in the base class so can't override it
   protected async customProcessFiles(
     args: GraphQLDataSourceProcessOptions,
     fileVariables: FileVariablesTuple[]
@@ -217,6 +232,7 @@ export default class FileUploadDataSource extends ProfusionFileUploadDataSource 
       ...request.http,
       // Apollo types are not up-to-date, make TS happy
       body: form as unknown as string,
+      // All of this copying for this one line change
       headers: Object.fromEntries(request.http.headers),
     };
 

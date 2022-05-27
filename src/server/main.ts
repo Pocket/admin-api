@@ -53,6 +53,7 @@ async function startServer() {
         defaultMaxAge: config.apollo.defaultMaxAge,
       }),
     ],
+    // enable cross-site request forgery protection
     csrfPrevention: true,
   });
   await server.start();
