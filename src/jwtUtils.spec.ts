@@ -63,6 +63,26 @@ describe('jwtUtils', () => {
         },
       ],
     };
+    const mozillaAuthProxyJwks = {
+      keys: [
+        {
+          alg: 'RS256',
+          e: 'AQAB',
+          kid: 'OR8erz5A8/hCkVdHczk879k2zUQXoAke9p8TQXsgKLQ=',
+          kty: 'RSA',
+          n: 'vHxdjnAQDDHUo0cMBLEiO3wpBC3VSpevy4ccOlBy2TmuqeyOwz65-L_bTJQjgqCFTFT8JfOsklumWT37gU9BAaxyCWk455ALwf8aq_FDjyArnRVXChIAEVfjy40WtmaEbEp-RJVh83vI31F1HtIoHgq7yQRd76GBjxXQDKsvs4zbeVK_MTKK0LtfQKNT1lOCFOVHUVu3_-7lzl-zrY7_OX5v6mU4AtrqfKTr1t06BdlPTFu06-3Ug-LuyLgwiC4AFp4P3XpM_MaMElHObFKRvqp9GLoknLhSymUAGEORbzr5J7PvWxf7XWNl0zlozYg-vtKHv5bcNNU7K2gvdqMxtQ',
+          use: 'sig',
+        },
+        {
+          alg: 'RS256',
+          e: 'AQAB',
+          kid: 'QtBbT/twDz6JmT99PQkAOB+QBhG4eJvxk8pOr7YzfWU=',
+          kty: 'RSA',
+          n: 'tvivV24KuPtRi2ehzTCv5Wzu_zi39r0vW38bd2drNUJpAFVhoFcoc9F9Mq4rnbN4bZyW3a6uDeUUKAG5MiZC7oZheqCLrdNkYO7Zao25X1GpycFIVnNccVFyyeS_qvYauXOR1B8rzPub9bf9z9jIRCX5wQ675FNsanwpAT-ZhWjoT3PQnHaMvNHD4d4_J6ObCO8GFZqn2NTflYeeob_-iZxlKR_EI1xz9S_8FRVMIpHvudmKvE1Gc3HLo1S6tGo4Fvep9k4elae_54Z4a-DaI3F_j3MtQ7V8WMZEGd5qXrfFxFDV5t45YJBwWlCWPxY9ESyMJKlknLkPEZs45G6vMw',
+          use: 'sig',
+        },
+      ],
+    };
     const pocketJwks = {
       keys: [
         {
@@ -80,6 +100,12 @@ describe('jwtUtils', () => {
         .persist()
         .get('/.well-known/jwks.json')
         .reply(200, cognitoJwks);
+      const mozillaAuthProxyMock = nock(
+        'https://' + config.auth.mozillaAuthProxy.jwtIssuer
+      )
+        .persist()
+        .get('/.well-known/jwks.json')
+        .reply(200, mozillaAuthProxyJwks);
       nock('https://' + config.auth.pocket.jwtIssuer)
         .get('/.well-known/jwk')
         .reply(200, pocketJwks);
@@ -89,10 +115,13 @@ describe('jwtUtils', () => {
       expect(Object.keys(keys)).toEqual([
         'kze4M0CiXoDO7Qkpig1oH0F6OInzZg6ugk0PyojOlzc=',
         '4w35mrh4EBECpjJnyIjdQ60yjh3xeI1m0VF1H/z0T/c=',
+        'OR8erz5A8/hCkVdHczk879k2zUQXoAke9p8TQXsgKLQ=',
+        'QtBbT/twDz6JmT99PQkAOB+QBhG4eJvxk8pOr7YzfWU=',
         'CURMIG',
       ]);
 
       cognitoMock.persist(false);
+      mozillaAuthProxyMock.persist(false);
     });
   });
 });
