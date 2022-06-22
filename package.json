@@ -34,7 +34,7 @@
     "jsonwebtoken": "8.5.1",
     "jwks-rsa": "1.12.3",
     "node-fetch": "2.6.7",
-    "qs": "6.10.3"
+    "qs": "6.10.5"
   },
   "devDependencies": {
     "@pocket-tools/eslint-config": "1.1.0",
@@ -44,15 +44,15 @@
     "@types/jest": "27.5.2",
     "@types/jsonwebtoken": "8.5.8",
     "@types/lodash": "4.14.182",
-    "@types/node": "16.11.38",
+    "@types/node": "16.11.41",
     "@types/sinon": "10.0.11",
     "chai": "4.3.6",
-    "jest": "28.1.0",
+    "jest": "28.1.1",
     "lodash": "4.17.21",
-    "nock": "13.2.6",
+    "nock": "13.2.7",
     "nodemon": "2.0.16",
     "sinon": "14.0.0",
-    "ts-jest": "28.0.4",
+    "ts-jest": "28.0.5",
     "ts-node": "10.7.0",
     "prettier": "2.5.1"
   }
