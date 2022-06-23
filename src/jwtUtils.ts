@@ -141,6 +141,17 @@ function getCognitoJwks() {
 }
 
 /**
+ * Get JWKs from mozilla auth proxy
+ */
+function getMozillaAuthProxyJwks() {
+  const jwksUri = `https://${config.auth.mozillaAuthProxy.jwtIssuer}/.well-known/jwks.json`;
+  const client = getJwksClient(jwksUri);
+  return config.auth.mozillaAuthProxy.kids.map((kid: string) =>
+    client.getSigningKeyAsync(kid)
+  );
+}
+
+/**
  * Get JWKs from Pocket
  */
 function getPocketJwks() {
@@ -158,7 +169,11 @@ function getPocketJwks() {
 export const getSigningKeysFromServer = async (): Promise<
   Record<string, string>
 > => {
-  const keys = await Promise.all([...getCognitoJwks(), ...getPocketJwks()]);
+  const keys = await Promise.all([
+    ...getCognitoJwks(),
+    ...getMozillaAuthProxyJwks(),
+    ...getPocketJwks(),
+  ]);
 
   const publicKeyStringRecords: Record<string, string> = keys.reduce(
     (acc: Record<string, string>, key: jwksClient.SigningKey) => {

@@ -23,6 +23,8 @@ const config = {
   },
   isDev: process.env.NODE_ENV === 'development',
   auth: {
+    //Cognito is deprecated in favor of Mozilla Auth Proxy, but we still need to support it
+    //Mozilla Auth Proxy supports a larger number of user groups for a user.
     cognito: {
       jwtIssuer:
         process.env.COGNITO_JWT_ISSUER ||
@@ -32,12 +34,21 @@ const config = {
         '4w35mrh4EBECpjJnyIjdQ60yjh3xeI1m0VF1H/z0T/c=',
       ],
     },
+    mozillaAuthProxy: {
+      jwtIssuer:
+        process.env.MOZILLA_AUTH_PROXY_JWT_ISSUER ||
+        'cognito-idp.us-east-1.amazonaws.com/us-east-1_qYkccPmmu',
+      kids: process.env.MOZILLA_AUTH_PROXY_KIDS?.split(',') || [
+        'OR8erz5A8/hCkVdHczk879k2zUQXoAke9p8TQXsgKLQ=',
+        'QtBbT/twDz6JmT99PQkAOB+QBhG4eJvxk8pOr7YzfWU=',
+      ],
+    },
     pocket: {
       jwtIssuer: process.env.POCKET_JWT_ISSUER || 'getpocket.com',
       kids: process.env.POCKET_KIDS?.split(',') || ['CURMIG'],
     },
     defaultKid:
-      process.env.DEFAULT_KID || 'kze4M0CiXoDO7Qkpig1oH0F6OInzZg6ugk0PyojOlzc=',
+      process.env.DEFAULT_KID || 'OR8erz5A8/hCkVdHczk879k2zUQXoAke9p8TQXsgKLQ=',
   },
 };
 
