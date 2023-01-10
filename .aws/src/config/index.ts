@@ -11,6 +11,7 @@ const githubConnectionArn = isDev
   : 'arn:aws:codestar-connections:us-east-1:996905175585:connection/5fa5aa2b-a2d2-43e3-ab5a-72ececfc1870';
 const branch = isDev ? 'dev' : 'main';
 const isProd = process.env.NODE_ENV === 'production';
+const s3LogsBucket = isDev ? 'pocket-data-items-dev' : 'pocket-data-items';
 
 //Arbitrary size and count for cache. No logic was used in deciding this.
 /*
@@ -38,6 +39,7 @@ export const config = {
   domain,
   cacheNodes,
   cacheSize,
+  s3LogsBucket,
   isDev,
   codePipeline: {
     githubConnectionArn,
