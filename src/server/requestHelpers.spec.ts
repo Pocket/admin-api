@@ -43,11 +43,15 @@ describe('request helpers', () => {
       ice: 'cannon',
       tShirt: 'cube',
       'x-forwarded-for': 'myip',
+      'apollo-require-preflight': 'true',
     };
     addRecordToRequestHeader(arbitraryObject, request);
     expect(request.http.headers.get('ice')).toEqual('cannon');
     expect(request.http.headers.get('tShirt')).toEqual('cube');
     expect(request.http.headers.get('x-forwarded-for')).toEqual('myip');
+    expect(request.http.headers.get('apollo-require-preflight')).toEqual(
+      'true'
+    );
   });
 
   it('extracts first value from string array, or returns the string', () => {
