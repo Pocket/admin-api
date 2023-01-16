@@ -10,6 +10,7 @@ export type IContext = {
   adminAPIUser?: AdminAPIUser;
   forwardHeaders?: {
     'origin-client-ip': string;
+    'apollo-require-preflight': string;
   };
 };
 
@@ -36,6 +37,9 @@ export async function getAppContext(
     // We want the originating client, which is the leftmost IP address
     // if x-forwarded-for is an array
     'origin-client-ip': extractHeader(req.headers['x-forwarded-for']),
+    'apollo-require-preflight': extractHeader(
+      req.headers['apollo-require-preflight']
+    ),
   };
 
   return context;
