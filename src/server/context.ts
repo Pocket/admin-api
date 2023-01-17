@@ -37,6 +37,8 @@ export async function getAppContext(
     // We want the originating client, which is the leftmost IP address
     // if x-forwarded-for is an array
     'origin-client-ip': extractHeader(req.headers['x-forwarded-for']),
+    // As of January 17th 2023, we have to explicitly forward the preflight header.
+    // Apollo v4 subgraphs / services are not receiving this header from the client. This could be due to the reason that this service is still on Apollo v3.
     'apollo-require-preflight': extractHeader(
       req.headers['apollo-require-preflight']
     ),

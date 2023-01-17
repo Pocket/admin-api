@@ -1,7 +1,7 @@
 import { GatewayConfig } from '@apollo/gateway';
 import { GraphQLRequest } from 'apollo-server-types';
 import { ApolloGateway } from '@apollo/gateway';
-import FileUploadDataSource from './FileUploadDataSource';
+import FileUploadDataSource from '@profusion/apollo-federation-upload';
 import config from './../config';
 import { IContext } from './context';
 import {
@@ -11,7 +11,7 @@ import {
 import { readFileSync } from 'fs';
 
 let options: GatewayConfig = {
-  buildService({ url }) {
+  buildService: ({ url }) => {
     // FileUploadDataSource extends RemoteGraphQLDataSource from @apollo/gateway
     return new FileUploadDataSource({
       url,
