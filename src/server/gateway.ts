@@ -11,7 +11,7 @@ import {
 import { readFileSync } from 'fs';
 
 let options: GatewayConfig = {
-  buildService: ({ url }) => {
+  buildService({ url }) {
     // FileUploadDataSource extends RemoteGraphQLDataSource from @apollo/gateway
     return new FileUploadDataSource({
       url,
