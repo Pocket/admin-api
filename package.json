@@ -17,7 +17,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@apollo/gateway": "2.0.5",
+    "@apollo/gateway": "2.3.2",
     "@pocket-tools/apollo-utils": "2.2.0",
     "@profusion/apollo-federation-upload": "4.0.0",
     "@sentry/node": "7.6.0",
@@ -51,9 +51,9 @@
     "lodash": "4.17.21",
     "nock": "13.3.0",
     "nodemon": "2.0.22",
+    "prettier": "2.8.7",
     "sinon": "15.0.0",
     "ts-jest": "28.0.8",
-    "ts-node": "10.9.1",
-    "prettier": "2.8.7"
+    "ts-node": "10.9.1"
   }
 }
