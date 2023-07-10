@@ -31,7 +31,7 @@
     "aws-xray-sdk-express": "3.3.8",
     "deep-equal-in-any-order": "1.1.19",
     "graphql-upload": "13.0.0",
-    "jsonwebtoken": "8.5.1",
+    "jsonwebtoken": "9.0.0",
     "jwks-rsa": "1.12.3",
     "node-fetch": "2.6.12",
     "qs": "6.10.5"
