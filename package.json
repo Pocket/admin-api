@@ -44,7 +44,7 @@
     "@types/jest": "28.1.8",
     "@types/jsonwebtoken": "9.0.2",
     "@types/lodash": "4.14.195",
-    "@types/node": "16.11.47",
+    "@types/node": "16.18.38",
     "@types/sinon": "10.0.15",
     "chai": "4.3.7",
     "jest": "28.1.3",
