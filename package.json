@@ -41,7 +41,7 @@
     "@pocket-tools/tsconfig": "2.0.1",
     "@types/chai": "4.3.5",
     "@types/deep-equal-in-any-order": "1.0.1",
-    "@types/jest": "29.5.2",
+    "@types/jest": "29.5.3",
     "@types/jsonwebtoken": "9.0.2",
     "@types/lodash": "4.14.195",
     "@types/node": "16.18.38",
