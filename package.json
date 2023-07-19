@@ -33,7 +33,7 @@
     "graphql-upload": "13.0.0",
     "jsonwebtoken": "9.0.1",
     "jwks-rsa": "1.12.3",
-    "node-fetch": "2.6.12",
+    "node-fetch": "3.3.1",
     "qs": "6.11.2"
   },
   "devDependencies": {
