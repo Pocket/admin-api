@@ -12,7 +12,7 @@ import Sentry from '@sentry/node';
 /**
  * Properties of the identity property in CognitoUser below
  */
-export interface CoginitoUserIdentity {
+export interface CognitoUserIdentity {
   userId: string;
 }
 
@@ -32,7 +32,7 @@ export interface CognitoUser {
   exp: number;
   iat: number;
   email_verified: string;
-  identities: CoginitoUserIdentity[];
+  identities: CognitoUserIdentity[];
 }
 
 /**
@@ -136,7 +136,7 @@ function getCognitoJwks() {
   const jwksUri = `https://${config.auth.cognito.jwtIssuer}/.well-known/jwks.json`;
   const client = getJwksClient(jwksUri);
   return config.auth.cognito.kids.map((kid: string) =>
-    client.getSigningKeyAsync(kid)
+    client.getSigningKey(kid)
   );
 }
 
@@ -147,7 +147,7 @@ function getMozillaAuthProxyJwks() {
   const jwksUri = `https://${config.auth.mozillaAuthProxy.jwtIssuer}/.well-known/jwks.json`;
   const client = getJwksClient(jwksUri);
   return config.auth.mozillaAuthProxy.kids.map((kid: string) =>
-    client.getSigningKeyAsync(kid)
+    client.getSigningKey(kid)
   );
 }
 
@@ -158,7 +158,7 @@ function getPocketJwks() {
   const jwksUri = `https://${config.auth.pocket.jwtIssuer}/.well-known/jwk`;
   const client = getJwksClient(jwksUri);
   return config.auth.pocket.kids.map((kid: string) =>
-    client.getSigningKeyAsync(kid)
+    client.getSigningKey(kid)
   );
 }
 
