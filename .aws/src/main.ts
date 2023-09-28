@@ -98,14 +98,15 @@ class AdminAPI extends TerraformStack {
         workspaces: {
           name: 'incident-management',
         },
-      }
+      },
     );
 
     return new PocketPagerDuty(this, 'pagerduty', {
       prefix: config.prefix,
       service: {
+        // This is a Tier 2 service and as such only raises non-critical alarms.
         criticalEscalationPolicyId: incidentManagement
-          .get('policy_default_critical_id')
+          .get('policy_default_non_critical_id')
           .toString(),
         nonCriticalEscalationPolicyId: incidentManagement
           .get('policy_default_non_critical_id')
@@ -250,12 +251,14 @@ class AdminAPI extends TerraformStack {
       },
       alarms: {
         http5xxErrorPercentage: {
-          //Triggers critical alert if 50% of request throws 5xx for
+          //Triggers non-critical alert if 50% of request throws 5xx for
           // 4 continuous evaluation period for 20 mins (5 mins per period)
           threshold: 50,
           evaluationPeriods: 4,
           period: 300, //in seconds, 5 mins per period
-          actions: config.isProd ? [pagerDuty.snsCriticalAlarmTopic.arn] : [],
+          actions: config.isProd
+            ? [pagerDuty.snsNonCriticalAlarmTopic.arn]
+            : [],
         },
         httpLatency: {
           //Triggers non-critical alert if latency is above 500ms
