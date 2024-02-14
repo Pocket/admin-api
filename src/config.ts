@@ -46,11 +46,10 @@ const config = {
     pocket: {
       jwtIssuer: process.env.POCKET_JWT_ISSUER || 'getpocket.com',
       kids: process.env.POCKET_KIDS?.split(',') ||
-        (
           process.env.NODE_ENV === 'production'
             ? ['CURMIG', 'CORPSL']
             : ['CMGDEV', 'CORDEV']
-        ),
+        ,
     },
     defaultKid:
       process.env.DEFAULT_KID || 'OR8erz5A8/hCkVdHczk879k2zUQXoAke9p8TQXsgKLQ=',

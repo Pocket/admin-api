@@ -2,6 +2,7 @@ import * as jwtUtils from './jwtUtils';
 import nock from 'nock';
 import config from './config';
 import { getSigningKeysFromServer } from './jwtUtils';
+import resetModules = jest.resetModules;
 
 describe('jwtUtils', () => {
   describe('buildAdminAPIUserFromPayload', () => {
@@ -43,6 +44,12 @@ describe('jwtUtils', () => {
   });
 
   describe('getSigningKeysFromServer', () => {
+    beforeEach(() => {
+      // Reset the module registry before each test to allow a changed environment to
+      // be reflected in the config that is imported.
+      jest.resetModules();
+    });
+
     const cognitoJwks = {
       keys: [
         {
@@ -135,7 +142,28 @@ describe('jwtUtils', () => {
         }
       ]
     };
-    it('should get keys from cognito and pocket', async () => {
+
+    // [environment, expectedKeys]
+    const envs = ['development', 'production'];
+
+    it.each(envs)(`should get keys from cognito and pocket in %s`, async (env) => {
+      const kids = env === 'development'
+        ? ['CMGDEV', 'CORDEV']
+        : ['CURMIG', 'CORPSL'];
+
+      if (env === 'production') {
+        jest.mock('./config', () => {
+          // First, import the actual config module
+          const actualConfig = jest.requireActual('./config');
+
+          // Then, modify only the specific part you want to mock
+          actualConfig.auth.pocket.kids = ['CURMIG', 'CORPSL'];
+
+          // Return the modified config
+          return actualConfig;
+        });
+      }
+
       const cognitoMock = nock('https://' + config.auth.cognito.jwtIssuer)
         .persist()
         .get('/.well-known/jwks.json')
@@ -147,6 +175,7 @@ describe('jwtUtils', () => {
         .get('/.well-known/jwks.json')
         .reply(200, mozillaAuthProxyJwks);
       nock('https://' + config.auth.pocket.jwtIssuer)
+        .persist()
         .get('/.well-known/jwk')
         .reply(200, pocketJwks);
 
@@ -157,8 +186,7 @@ describe('jwtUtils', () => {
         '4w35mrh4EBECpjJnyIjdQ60yjh3xeI1m0VF1H/z0T/c=',
         'OR8erz5A8/hCkVdHczk879k2zUQXoAke9p8TQXsgKLQ=',
         'QtBbT/twDz6JmT99PQkAOB+QBhG4eJvxk8pOr7YzfWU=',
-        'CMGDEV',
-        'CORDEV',
+        ...kids,
       ]);
 
       cognitoMock.persist(false);
