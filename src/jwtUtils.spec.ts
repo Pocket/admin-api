@@ -1,8 +1,5 @@
 import * as jwtUtils from './jwtUtils';
 import nock from 'nock';
-import config from './config';
-import { getSigningKeysFromServer } from './jwtUtils';
-import resetModules = jest.resetModules;
 
 describe('jwtUtils', () => {
   describe('buildAdminAPIUserFromPayload', () => {
@@ -144,25 +141,16 @@ describe('jwtUtils', () => {
     };
 
     // [environment, expectedKeys]
-    const envs = ['development', 'production'];
+    const envs = ['production', 'development'];
 
     it.each(envs)(`should get keys from cognito and pocket in %s`, async (env) => {
-      const kids = env === 'development'
+      process.env.NODE_ENV = env;
+      const { getSigningKeysFromServer } = require('./jwtUtils');
+      const config = require('./config').default;
+
+      const expectedKids = env === 'development'
         ? ['CMGDEV', 'CORDEV']
         : ['CURMIG', 'CORPSL'];
-
-      if (env === 'production') {
-        jest.mock('./config', () => {
-          // First, import the actual config module
-          const actualConfig = jest.requireActual('./config');
-
-          // Then, modify only the specific part you want to mock
-          actualConfig.auth.pocket.kids = ['CURMIG', 'CORPSL'];
-
-          // Return the modified config
-          return actualConfig;
-        });
-      }
 
       const cognitoMock = nock('https://' + config.auth.cognito.jwtIssuer)
         .persist()
@@ -186,7 +174,7 @@ describe('jwtUtils', () => {
         '4w35mrh4EBECpjJnyIjdQ60yjh3xeI1m0VF1H/z0T/c=',
         'OR8erz5A8/hCkVdHczk879k2zUQXoAke9p8TQXsgKLQ=',
         'QtBbT/twDz6JmT99PQkAOB+QBhG4eJvxk8pOr7YzfWU=',
-        ...kids,
+        ...expectedKids,
       ]);
 
       cognitoMock.persist(false);
