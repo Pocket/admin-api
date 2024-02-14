@@ -20,7 +20,7 @@ type FileVariablesTuple = [string, Promise<FileUpload>];
 type Variables = Record<string, unknown> | null;
 type AddDataHandler = (
   form: FormData,
-  resolvedFiles: FileUpload[]
+  resolvedFiles: FileUpload[],
 ) => Promise<void | void[]>;
 
 type ConstructorArgs = Exclude<
@@ -34,7 +34,7 @@ export type FileUploadDataSourceArgs = ConstructorArgs & {
 
 const addChunkedDataToForm: AddDataHandler = (
   form: FormData,
-  resolvedFiles: FileUpload[]
+  resolvedFiles: FileUpload[],
 ): Promise<void> => {
   resolvedFiles.forEach(
     ({ createReadStream, filename, mimetype: contentType }, i: number) => {
@@ -49,20 +49,20 @@ const addChunkedDataToForm: AddDataHandler = (
           */
         knownLength: Number.NaN,
       });
-    }
+    },
   );
   return Promise.resolve();
 };
 
 const addDataToForm: AddDataHandler = (
   form: FormData,
-  resolvedFiles: FileUpload[]
+  resolvedFiles: FileUpload[],
 ): Promise<void[]> => {
   return Promise.all(
     resolvedFiles.map(
       async (
         { createReadStream, filename, mimetype: contentType },
-        i: number
+        i: number,
       ): Promise<void> => {
         const fileData = await new Promise<Buffer>((resolve, reject) => {
           const stream = createReadStream();
@@ -80,8 +80,8 @@ const addDataToForm: AddDataHandler = (
           filename,
           knownLength: fileData.length,
         });
-      }
-    )
+      },
+    ),
   );
 };
 
@@ -108,11 +108,11 @@ export default class FileUploadDataSource extends ProfusionFileUploadDataSource 
 
   // re-initializing this because it's a private member in the base class so can't override it
   private static customExtractFileVariables(
-    rootVariables?: Variables
+    rootVariables?: Variables,
   ): FileVariablesTuple[] {
     const extract = (
       variables?: Variables,
-      prefix?: string
+      prefix?: string,
     ): FileVariablesTuple[] => {
       return Object.entries(variables || {}).reduce(
         (acc: FileVariablesTuple[], [name, value]): FileVariablesTuple[] => {
@@ -132,20 +132,20 @@ export default class FileUploadDataSource extends ProfusionFileUploadDataSource 
                 value.map(
                   (
                     v: Promise<FileUpload> | Upload,
-                    idx: number
+                    idx: number,
                   ): FileVariablesTuple => [
                     `${key}.${idx}`,
                     v instanceof Upload ? v.promise : v,
-                  ]
-                )
+                  ],
+                ),
               );
             }
             if (isObject(first)) {
               return acc.concat(
                 ...value.map(
                   (v: Variables, idx: number): FileVariablesTuple[] =>
-                    extract(v, `${key}.${idx}`)
-                )
+                    extract(v, `${key}.${idx}`),
+                ),
               );
             }
             return acc;
@@ -155,17 +155,17 @@ export default class FileUploadDataSource extends ProfusionFileUploadDataSource 
           }
           return acc;
         },
-        []
+        [],
       );
     };
     return extract(rootVariables);
   }
 
   async process(
-    args: GraphQLDataSourceProcessOptions
+    args: GraphQLDataSourceProcessOptions,
   ): Promise<GraphQLResponse> {
     const fileVariables = FileUploadDataSource.customExtractFileVariables(
-      args.request.variables
+      args.request.variables,
     );
     if (fileVariables.length > 0) {
       return this.customProcessFiles(args, fileVariables);
@@ -176,7 +176,7 @@ export default class FileUploadDataSource extends ProfusionFileUploadDataSource 
   // re-initializing this because it's a private member in the base class so can't override it
   protected async customProcessFiles(
     args: GraphQLDataSourceProcessOptions,
-    fileVariables: FileVariablesTuple[]
+    fileVariables: FileVariablesTuple[],
   ): Promise<GraphQLResponse> {
     const { context, request } = args;
     const form = new FormData();
@@ -199,13 +199,13 @@ export default class FileUploadDataSource extends ProfusionFileUploadDataSource 
       fileVariables.map(
         async (
           [variableName, file]: FileVariablesTuple,
-          i: number
+          i: number,
         ): Promise<FileUpload> => {
           const fileUpload: FileUpload = await file;
           fileMap[i] = [`variables.${variableName}`];
           return fileUpload;
-        }
-      )
+        },
+      ),
     );
 
     // This must come before the file contents append bellow

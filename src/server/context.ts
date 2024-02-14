@@ -16,7 +16,7 @@ export type IContext = {
 
 export async function getAppContext(
   { req },
-  publicKeys: Record<string, string>
+  publicKeys: Record<string, string>,
 ): Promise<IContext> {
   //See if we have an authorization header
   const token = req.headers.authorization ?? null;
@@ -29,7 +29,7 @@ export async function getAppContext(
     //AHH we have a user. Lets put it in our request to use elsewhere.
     context.adminAPIUser = await validateAndGetAdminAPIUser(
       context.token,
-      publicKeys
+      publicKeys,
     );
   }
   // Add the request headers we want to forward to the subgraphs
@@ -38,7 +38,7 @@ export async function getAppContext(
     // if x-forwarded-for is an array
     'origin-client-ip': extractHeader(req.headers['x-forwarded-for']),
     'apollo-require-preflight': extractHeader(
-      req.headers['apollo-require-preflight']
+      req.headers['apollo-require-preflight'],
     ),
   };
 

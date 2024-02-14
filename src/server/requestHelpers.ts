@@ -19,7 +19,7 @@ export function extractHeader(header: string | string[]): string {
  */
 export function addRecordToRequestHeader(
   record: Record<string, string>,
-  request: GraphQLRequest
+  request: GraphQLRequest,
 ): void {
   Object.entries(record).forEach(([key, value]) => {
     request.http.headers.set(key, value);
@@ -35,7 +35,7 @@ export function addRecordToRequestHeader(
  */
 export function buildRequestHeadersFromAdminAPIUser(
   request: GraphQLRequest,
-  user: AdminAPIUser
+  user: AdminAPIUser,
 ): GraphQLRequest {
   for (const property in user) {
     if (Object.prototype.hasOwnProperty.call(user, property)) {

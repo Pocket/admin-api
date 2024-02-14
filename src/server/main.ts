@@ -70,7 +70,7 @@ app.use(
   graphqlUploadExpress({
     maxFileSize: config.app.upload.maxSize,
     maxFiles: config.app.upload.maxFiles,
-  })
+  }),
 );
 
 //If there is no host header (really there always should be..) then use admin-api as the name

@@ -45,11 +45,11 @@ const config = {
     },
     pocket: {
       jwtIssuer: process.env.POCKET_JWT_ISSUER || 'getpocket.com',
-      kids: process.env.POCKET_KIDS?.split(',') ||
-          process.env.NODE_ENV === 'production'
-            ? ['CURMIG', 'CORPSL']
-            : ['CMGDEV', 'CORDEV']
-        ,
+      kids:
+        process.env.POCKET_KIDS?.split(',') ||
+        process.env.NODE_ENV === 'production'
+          ? ['CURMIG', 'CORPSL']
+          : ['CMGDEV', 'CORDEV'],
     },
     defaultKid:
       process.env.DEFAULT_KID || 'OR8erz5A8/hCkVdHczk879k2zUQXoAke9p8TQXsgKLQ=',
@@ -67,7 +67,7 @@ memcached.client.on('failure', function (details) {
     'Server ' +
       details.server +
       'went down due to: ' +
-      details.messages.join('')
+      details.messages.join(''),
   );
 });
 
@@ -77,7 +77,7 @@ memcached.client.on('reconnecting', function (details) {
       details.server +
       ' :' +
       details.totalDownTime +
-      'ms'
+      'ms',
   );
 });
 
@@ -86,7 +86,7 @@ memcached.client.on('issue', function (details) {
     'Server ' +
       details.server +
       'had an issue due to: ' +
-      details.messages.join('')
+      details.messages.join(''),
   );
 });
 
