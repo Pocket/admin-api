@@ -124,7 +124,7 @@ function getJwksClient(jwksUri: string) {
   return jwksClient({
     jwksUri,
     cache: true, // Default Value
-    cacheMaxEntries: 5, // Default value
+    cacheMaxEntries: 100,
     cacheMaxAge: SIGNING_KEY_TTL,
   });
 }
