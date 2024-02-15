@@ -36,8 +36,12 @@ jobs:
       ##########################
       # Checkout the code base #
       ##########################
-      - name: Checkout Code
-        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # super-linter needs the full git history to get the
+          # list of files that changed across commits
+          fetch-depth: 0
 
       ##########################
       # Github Super Linter needs
@@ -55,9 +59,7 @@ jobs:
       # Run Linter against code base #
       ################################
       - name: Lint Code Base
-
-        # We use the Github super linter, it can be cranky at times, so in that moment here are the docs https://github.com/github/super-linter
-        uses: docker://ghcr.io/github/super-linter:slim-v4@sha256:80ecaa58ad5f9480c66e3c77af5c955831861a41fb78ce7e0ffb1b443eca0f0f
+        uses: super-linter/super-linter@v6.0.0  # x-release-please-version
 
         # All Environment variables are defined here https://github.com/github/super-linter#environment-variables
         env:
