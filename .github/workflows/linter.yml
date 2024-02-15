@@ -63,6 +63,9 @@ jobs:
 
         # All Environment variables are defined here https://github.com/github/super-linter#environment-variables
         env:
+          # To report GitHub Actions status checks
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
           # The name of the repository default branch.
           DEFAULT_BRANCH: main
 
