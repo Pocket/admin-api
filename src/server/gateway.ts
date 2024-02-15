@@ -43,7 +43,7 @@ let options: GatewayConfig = {
   },
 };
 
-if (config.isDev) {
+if (process.env.NODE_ENV === 'local') {
   options = {
     ...options,
     //If we are development lets compile the schema locally and not hit apollo engine.

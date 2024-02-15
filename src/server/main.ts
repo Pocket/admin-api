@@ -37,7 +37,7 @@ Sentry.init({
 async function startServer() {
   const server = new ApolloServer({
     gateway: getAppGateway(),
-    debug: config.isDev,
+    debug: process.env.NODE_ENV !== 'production',
     // Enable schema introspection so that GraphQL Codegen can generate types
     // that are used by Apollo Client in frontend apps
     introspection: true,

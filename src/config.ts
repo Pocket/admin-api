@@ -21,7 +21,6 @@ const config = {
     release: process.env.GIT_SHA || '',
     environment: process.env.NODE_ENV || 'development',
   },
-  isDev: process.env.NODE_ENV === 'development',
   auth: {
     //Cognito is deprecated in favor of Mozilla Auth Proxy, but we still need to support it
     //Mozilla Auth Proxy supports a larger number of user groups for a user.
