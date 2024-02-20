@@ -2,7 +2,6 @@ import { GatewayConfig } from '@apollo/gateway';
 import { GraphQLRequest } from 'apollo-server-types';
 import { ApolloGateway } from '@apollo/gateway';
 import FileUploadDataSource from './FileUploadDataSource';
-import config from './../config';
 import { IContext } from './context';
 import {
   buildRequestHeadersFromAdminAPIUser,
