@@ -59,7 +59,7 @@ export interface AdminAPIUser {
  */
 export const validateAndGetAdminAPIUser = async (
   rawJwtToken: string,
-  publicKeys: Record<string, string>
+  publicKeys: Record<string, string>,
 ): Promise<AdminAPIUser> => {
   const decoded = decodeDataJwt(rawJwtToken);
   // Type for payload is a JwtPayload or a string which breaks the if statement,
@@ -67,13 +67,13 @@ export const validateAndGetAdminAPIUser = async (
   const payload = decoded.payload as JwtPayload;
   if (!payload.iss) {
     throw new AuthenticationError(
-      'The JWT has no issuer defined, unable to verify'
+      'The JWT has no issuer defined, unable to verify',
     );
   }
   try {
     jwt.verify(
       rawJwtToken,
-      publicKeys[decoded.header.kid || config.auth.defaultKid]
+      publicKeys[decoded.header.kid || config.auth.defaultKid],
     );
   } catch (err) {
     console.error('Could not validate jwt', {
@@ -96,7 +96,7 @@ export const validateAndGetAdminAPIUser = async (
 };
 
 export const buildAdminAPIUserFromPayload = (
-  payload: CognitoUser
+  payload: CognitoUser,
 ): AdminAPIUser => {
   // the identities array should always have an entry
   const identity = payload.identities[0];
@@ -124,7 +124,7 @@ function getJwksClient(jwksUri: string) {
   return jwksClient({
     jwksUri,
     cache: true, // Default Value
-    cacheMaxEntries: 5, // Default value
+    cacheMaxEntries: 100,
     cacheMaxAge: SIGNING_KEY_TTL,
   });
 }
@@ -136,7 +136,7 @@ function getCognitoJwks() {
   const jwksUri = `https://${config.auth.cognito.jwtIssuer}/.well-known/jwks.json`;
   const client = getJwksClient(jwksUri);
   return config.auth.cognito.kids.map((kid: string) =>
-    client.getSigningKeyAsync(kid)
+    client.getSigningKeyAsync(kid),
   );
 }
 
@@ -147,7 +147,7 @@ function getMozillaAuthProxyJwks() {
   const jwksUri = `https://${config.auth.mozillaAuthProxy.jwtIssuer}/.well-known/jwks.json`;
   const client = getJwksClient(jwksUri);
   return config.auth.mozillaAuthProxy.kids.map((kid: string) =>
-    client.getSigningKeyAsync(kid)
+    client.getSigningKeyAsync(kid),
   );
 }
 
@@ -158,7 +158,7 @@ function getPocketJwks() {
   const jwksUri = `https://${config.auth.pocket.jwtIssuer}/.well-known/jwk`;
   const client = getJwksClient(jwksUri);
   return config.auth.pocket.kids.map((kid: string) =>
-    client.getSigningKeyAsync(kid)
+    client.getSigningKeyAsync(kid),
   );
 }
 
@@ -180,13 +180,13 @@ export const getSigningKeysFromServer = async (): Promise<
       acc[key.kid] = key.getPublicKey();
       return acc;
     },
-    {} as Record<string, string>
+    {} as Record<string, string>,
   );
 
   Object.values(publicKeyStringRecords).forEach((publicKeyString: string) => {
     if (!publicKeyString) {
       throw new Error(
-        'Unable to get the public key from the issuer to verify the JWT'
+        'Unable to get the public key from the issuer to verify the JWT',
       );
     }
   });

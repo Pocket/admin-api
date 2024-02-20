@@ -98,7 +98,7 @@ class AdminAPI extends TerraformStack {
         workspaces: {
           name: 'incident-management',
         },
-      }
+      },
     );
 
     return new PocketPagerDuty(this, 'pagerduty', {
@@ -147,7 +147,7 @@ class AdminAPI extends TerraformStack {
           ],
           envVars: [
             {
-              name: 'ENVIRONMENT',
+              name: 'NODE_ENV',
               value: process.env.NODE_ENV, // this gives us a nice lowercase production and development
             },
             {

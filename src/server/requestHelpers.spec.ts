@@ -29,7 +29,7 @@ describe('request helpers', () => {
 
     const subgraphRequest = buildRequestHeadersFromAdminAPIUser(
       request,
-      adminAPIUser
+      adminAPIUser,
     );
 
     const headers = subgraphRequest.http.headers;
@@ -50,7 +50,7 @@ describe('request helpers', () => {
     expect(request.http.headers.get('tShirt')).toEqual('cube');
     expect(request.http.headers.get('x-forwarded-for')).toEqual('myip');
     expect(request.http.headers.get('apollo-require-preflight')).toEqual(
-      'true'
+      'true',
     );
   });
 

@@ -37,7 +37,7 @@ Sentry.init({
 async function startServer() {
   const server = new ApolloServer({
     gateway: getAppGateway(),
-    debug: config.isDev,
+    debug: process.env.NODE_ENV !== 'production',
     // Enable schema introspection so that GraphQL Codegen can generate types
     // that are used by Apollo Client in frontend apps
     introspection: true,
@@ -70,7 +70,7 @@ app.use(
   graphqlUploadExpress({
     maxFileSize: config.app.upload.maxSize,
     maxFiles: config.app.upload.maxFiles,
-  })
+  }),
 );
 
 //If there is no host header (really there always should be..) then use admin-api as the name

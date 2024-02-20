@@ -2,7 +2,6 @@ import { GatewayConfig } from '@apollo/gateway';
 import { GraphQLRequest } from 'apollo-server-types';
 import { ApolloGateway } from '@apollo/gateway';
 import FileUploadDataSource from './FileUploadDataSource';
-import config from './../config';
 import { IContext } from './context';
 import {
   buildRequestHeadersFromAdminAPIUser,
@@ -43,7 +42,7 @@ let options: GatewayConfig = {
   },
 };
 
-if (config.isDev) {
+if (process.env.NODE_ENV === 'local') {
   options = {
     ...options,
     //If we are development lets compile the schema locally and not hit apollo engine.
