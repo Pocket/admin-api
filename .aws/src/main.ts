@@ -2,19 +2,23 @@ import { Construct } from 'constructs';
 import {
   App,
   DataTerraformRemoteState,
-  RemoteBackend,
+  S3Backend,
   TerraformStack,
 } from 'cdktf';
-import { AwsProvider, datasources, kms, sns } from '@cdktf/provider-aws';
 import { config } from './config';
 import {
   PocketALBApplication,
   PocketPagerDuty,
   PocketECSCodePipeline,
 } from '@pocket-tools/terraform-modules';
-import { PagerdutyProvider } from '@cdktf/provider-pagerduty';
-import { LocalProvider } from '@cdktf/provider-local';
-import { NullProvider } from '@cdktf/provider-null';
+import { AwsProvider } from '@cdktf/provider-aws/lib/provider';
+import { PagerdutyProvider } from '@cdktf/provider-pagerduty/lib/provider';
+import { NullProvider } from '@cdktf/provider-null/lib/provider';
+import { LocalProvider } from '@cdktf/provider-local/lib/provider';
+import { DataAwsRegion } from '@cdktf/provider-aws/lib/data-aws-region';
+import { DataAwsCallerIdentity } from '@cdktf/provider-aws/lib/data-aws-caller-identity';
+import { DataAwsSnsTopic } from '@cdktf/provider-aws/lib/data-aws-sns-topic';
+import { DataAwsKmsAlias } from '@cdktf/provider-aws/lib/data-aws-kms-alias';
 
 class AdminAPI extends TerraformStack {
   constructor(scope: Construct, name: string) {
@@ -25,14 +29,15 @@ class AdminAPI extends TerraformStack {
     new LocalProvider(this, 'local_provider');
     new NullProvider(this, 'null_provider');
 
-    new RemoteBackend(this, {
-      hostname: 'app.terraform.io',
-      organization: 'Pocket',
-      workspaces: [{ prefix: `${config.name}-` }],
+    new S3Backend(this, {
+      bucket: `mozilla-content-team-${config.environment.toLowerCase()}-terraform-state`,
+      dynamodbTable: `mozilla-content-team-${config.environment.toLowerCase()}-terraform-state`,
+      key: config.name,
+      region: 'us-east-1',
     });
 
-    const region = new datasources.DataAwsRegion(this, 'region');
-    const caller = new datasources.DataAwsCallerIdentity(this, 'caller');
+    const region = new DataAwsRegion(this, 'region');
+    const caller = new DataAwsCallerIdentity(this, 'caller');
 
     const pocketApp = this.createPocketAlbApplication({
       pagerDuty: this.createPagerDuty(),
@@ -49,7 +54,7 @@ class AdminAPI extends TerraformStack {
    * @private
    */
   private getCodeDeploySnsTopic() {
-    return new sns.DataAwsSnsTopic(this, 'backend_notifications', {
+    return new DataAwsSnsTopic(this, 'backend_notifications', {
       name: `Backend-${config.environment}-ChatBot`,
     });
   }
@@ -59,7 +64,7 @@ class AdminAPI extends TerraformStack {
    * @private
    */
   private getSecretsManagerKmsAlias() {
-    return new kms.DataAwsKmsAlias(this, 'kms_alias', {
+    return new DataAwsKmsAlias(this, 'kms_alias', {
       name: 'alias/aws/secretsmanager',
     });
   }
@@ -117,10 +122,10 @@ class AdminAPI extends TerraformStack {
 
   private createPocketAlbApplication(dependencies: {
     pagerDuty?: PocketPagerDuty;
-    region: datasources.DataAwsRegion;
-    caller: datasources.DataAwsCallerIdentity;
-    secretsManagerKmsAlias: kms.DataAwsKmsAlias;
-    snsTopic: sns.DataAwsSnsTopic;
+    region: DataAwsRegion;
+    caller: DataAwsCallerIdentity;
+    secretsManagerKmsAlias: DataAwsKmsAlias;
+    snsTopic: DataAwsSnsTopic;
   }): PocketALBApplication {
     const { pagerDuty, region, caller, secretsManagerKmsAlias, snsTopic } =
       dependencies;
