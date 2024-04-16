@@ -5,20 +5,16 @@ import {
   S3Backend,
   TerraformStack,
 } from 'cdktf';
+import { AwsProvider, datasources, kms, sns } from '@cdktf/provider-aws';
 import { config } from './config';
 import {
   PocketALBApplication,
   PocketPagerDuty,
   PocketECSCodePipeline,
 } from '@pocket-tools/terraform-modules';
-import { AwsProvider } from '@cdktf/provider-aws/lib/provider';
-import { PagerdutyProvider } from '@cdktf/provider-pagerduty/lib/provider';
-import { NullProvider } from '@cdktf/provider-null/lib/provider';
-import { LocalProvider } from '@cdktf/provider-local/lib/provider';
-import { DataAwsRegion } from '@cdktf/provider-aws/lib/data-aws-region';
-import { DataAwsCallerIdentity } from '@cdktf/provider-aws/lib/data-aws-caller-identity';
-import { DataAwsSnsTopic } from '@cdktf/provider-aws/lib/data-aws-sns-topic';
-import { DataAwsKmsAlias } from '@cdktf/provider-aws/lib/data-aws-kms-alias';
+import { PagerdutyProvider } from '@cdktf/provider-pagerduty';
+import { LocalProvider } from '@cdktf/provider-local';
+import { NullProvider } from '@cdktf/provider-null';
 
 class AdminAPI extends TerraformStack {
   constructor(scope: Construct, name: string) {
@@ -36,8 +32,8 @@ class AdminAPI extends TerraformStack {
       region: 'us-east-1',
     });
 
-    const region = new DataAwsRegion(this, 'region');
-    const caller = new DataAwsCallerIdentity(this, 'caller');
+    const region = new datasources.DataAwsRegion(this, 'region');
+    const caller = new datasources.DataAwsCallerIdentity(this, 'caller');
 
     const pocketApp = this.createPocketAlbApplication({
       pagerDuty: this.createPagerDuty(),
@@ -54,7 +50,7 @@ class AdminAPI extends TerraformStack {
    * @private
    */
   private getCodeDeploySnsTopic() {
-    return new DataAwsSnsTopic(this, 'backend_notifications', {
+    return new sns.DataAwsSnsTopic(this, 'backend_notifications', {
       name: `Backend-${config.environment}-ChatBot`,
     });
   }
@@ -64,7 +60,7 @@ class AdminAPI extends TerraformStack {
    * @private
    */
   private getSecretsManagerKmsAlias() {
-    return new DataAwsKmsAlias(this, 'kms_alias', {
+    return new kms.DataAwsKmsAlias(this, 'kms_alias', {
       name: 'alias/aws/secretsmanager',
     });
   }
@@ -96,14 +92,14 @@ class AdminAPI extends TerraformStack {
     }
 
     const incidentManagement = new DataTerraformRemoteState(
-      this,
-      'incident_management',
-      {
-        organization: 'Pocket',
-        workspaces: {
-          name: 'incident-management',
+        this,
+        'incident_management',
+        {
+          organization: 'Pocket',
+          workspaces: {
+            name: 'incident-management',
+          },
         },
-      },
     );
 
     return new PocketPagerDuty(this, 'pagerduty', {
@@ -111,24 +107,24 @@ class AdminAPI extends TerraformStack {
       service: {
         // This is a Tier 2 service and as such only raises non-critical alarms.
         criticalEscalationPolicyId: incidentManagement
-          .get('policy_default_non_critical_id')
-          .toString(),
+            .get('policy_default_non_critical_id')
+            .toString(),
         nonCriticalEscalationPolicyId: incidentManagement
-          .get('policy_default_non_critical_id')
-          .toString(),
+            .get('policy_default_non_critical_id')
+            .toString(),
       },
     });
   }
 
   private createPocketAlbApplication(dependencies: {
     pagerDuty?: PocketPagerDuty;
-    region: DataAwsRegion;
-    caller: DataAwsCallerIdentity;
-    secretsManagerKmsAlias: DataAwsKmsAlias;
-    snsTopic: DataAwsSnsTopic;
+    region: datasources.DataAwsRegion;
+    caller: datasources.DataAwsCallerIdentity;
+    secretsManagerKmsAlias: kms.DataAwsKmsAlias;
+    snsTopic: sns.DataAwsSnsTopic;
   }): PocketALBApplication {
     const { pagerDuty, region, caller, secretsManagerKmsAlias, snsTopic } =
-      dependencies;
+        dependencies;
 
     return new PocketALBApplication(this, 'application', {
       internal: false, //set to true to put it inside our vpc
@@ -248,7 +244,7 @@ class AdminAPI extends TerraformStack {
           },
         ],
         taskExecutionDefaultAttachmentArn:
-          'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy',
+            'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy',
       },
       autoscalingConfig: {
         targetMinCapacity: 2,
@@ -262,8 +258,8 @@ class AdminAPI extends TerraformStack {
           evaluationPeriods: 4,
           period: 300, //in seconds, 5 mins per period
           actions: config.isProd
-            ? [pagerDuty.snsNonCriticalAlarmTopic.arn]
-            : [],
+              ? [pagerDuty.snsNonCriticalAlarmTopic.arn]
+              : [],
         },
         httpLatency: {
           //Triggers non-critical alert if latency is above 500ms
@@ -272,8 +268,8 @@ class AdminAPI extends TerraformStack {
           threshold: 500,
           period: 900, //in seconds, 15 mins per period
           actions: config.isProd
-            ? [pagerDuty.snsNonCriticalAlarmTopic.arn]
-            : [],
+              ? [pagerDuty.snsNonCriticalAlarmTopic.arn]
+              : [],
         },
       },
     });
