@@ -2,7 +2,7 @@ import { Construct } from 'constructs';
 import {
   App,
   DataTerraformRemoteState,
-  RemoteBackend,
+  S3Backend,
   TerraformStack,
 } from 'cdktf';
 import { AwsProvider, datasources, kms, sns } from '@cdktf/provider-aws';
@@ -25,10 +25,11 @@ class AdminAPI extends TerraformStack {
     new LocalProvider(this, 'local_provider');
     new NullProvider(this, 'null_provider');
 
-    new RemoteBackend(this, {
-      hostname: 'app.terraform.io',
-      organization: 'Pocket',
-      workspaces: [{ prefix: `${config.name}-` }],
+    new S3Backend(this, {
+      bucket: `mozilla-content-team-${config.environment.toLowerCase()}-terraform-state`,
+      dynamodbTable: `mozilla-content-team-${config.environment.toLowerCase()}-terraform-state`,
+      key: config.name,
+      region: 'us-east-1',
     });
 
     const region = new datasources.DataAwsRegion(this, 'region');
