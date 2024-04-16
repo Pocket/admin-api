@@ -92,14 +92,14 @@ class AdminAPI extends TerraformStack {
     }
 
     const incidentManagement = new DataTerraformRemoteState(
-        this,
-        'incident_management',
-        {
-          organization: 'Pocket',
-          workspaces: {
-            name: 'incident-management',
-          },
+      this,
+      'incident_management',
+      {
+        organization: 'Pocket',
+        workspaces: {
+          name: 'incident-management',
         },
+      },
     );
 
     return new PocketPagerDuty(this, 'pagerduty', {
@@ -107,11 +107,11 @@ class AdminAPI extends TerraformStack {
       service: {
         // This is a Tier 2 service and as such only raises non-critical alarms.
         criticalEscalationPolicyId: incidentManagement
-            .get('policy_default_non_critical_id')
-            .toString(),
+          .get('policy_default_non_critical_id')
+          .toString(),
         nonCriticalEscalationPolicyId: incidentManagement
-            .get('policy_default_non_critical_id')
-            .toString(),
+          .get('policy_default_non_critical_id')
+          .toString(),
       },
     });
   }
@@ -124,7 +124,7 @@ class AdminAPI extends TerraformStack {
     snsTopic: sns.DataAwsSnsTopic;
   }): PocketALBApplication {
     const { pagerDuty, region, caller, secretsManagerKmsAlias, snsTopic } =
-        dependencies;
+      dependencies;
 
     return new PocketALBApplication(this, 'application', {
       internal: false, //set to true to put it inside our vpc
@@ -244,7 +244,7 @@ class AdminAPI extends TerraformStack {
           },
         ],
         taskExecutionDefaultAttachmentArn:
-            'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy',
+          'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy',
       },
       autoscalingConfig: {
         targetMinCapacity: 2,
@@ -258,8 +258,8 @@ class AdminAPI extends TerraformStack {
           evaluationPeriods: 4,
           period: 300, //in seconds, 5 mins per period
           actions: config.isProd
-              ? [pagerDuty.snsNonCriticalAlarmTopic.arn]
-              : [],
+            ? [pagerDuty.snsNonCriticalAlarmTopic.arn]
+            : [],
         },
         httpLatency: {
           //Triggers non-critical alert if latency is above 500ms
@@ -268,8 +268,8 @@ class AdminAPI extends TerraformStack {
           threshold: 500,
           period: 900, //in seconds, 15 mins per period
           actions: config.isProd
-              ? [pagerDuty.snsNonCriticalAlarmTopic.arn]
-              : [],
+            ? [pagerDuty.snsNonCriticalAlarmTopic.arn]
+            : [],
         },
       },
     });
