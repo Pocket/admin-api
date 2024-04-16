@@ -32,7 +32,7 @@ class AdminAPI extends TerraformStack {
     new S3Backend(this, {
       bucket: `mozilla-content-team-${config.environment.toLowerCase()}-terraform-state`,
       dynamodbTable: `mozilla-content-team-${config.environment.toLowerCase()}-terraform-state`,
-      key: 'AdminAPI',
+      key: config.name,
       region: 'us-east-1',
     });
 
