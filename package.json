@@ -17,7 +17,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@apollo/gateway": "2.3.2",
+    "@apollo/gateway": "2.8.5",
     "@pocket-tools/apollo-utils": "2.2.0",
     "@profusion/apollo-federation-upload": "4.0.0",
     "@sentry/node": "7.6.0",
