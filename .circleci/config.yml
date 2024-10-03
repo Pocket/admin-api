@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   aws-ecs: circleci/aws-ecs@3.2.0
-  pocket: pocket/circleci-orbs@2.2.0
+  pocket: pocket/circleci-orbs@2.3.0
   backstage-entity-validator: roadiehq/backstage-entity-validator@0.4.2
 
 # Workflow shortcuts
@@ -131,6 +131,7 @@ workflows:
           aws-access-key-id: Dev_AWS_ACCESS_KEY
           aws-secret-access-key: Dev_AWS_SECRET_ACCESS_KEY
           aws-region: Dev_AWS_DEFAULT_REGION
+          aws-account-id: ${ACCOUNT_ID_DEV}
           repo-name: adminapi-dev-app
           ecr-url: 410318598490.dkr.ecr.us-east-1.amazonaws.com
           push: false
@@ -145,6 +146,7 @@ workflows:
           aws-access-key-id: Dev_AWS_ACCESS_KEY
           aws-secret-access-key: Dev_AWS_SECRET_ACCESS_KEY
           aws-region: Dev_AWS_DEFAULT_REGION
+          aws-account-id: ${ACCOUNT_ID_DEV}
           codebuild-project-name: AdminAPI-Dev
           codebuild-project-branch: dev
           repo-name: adminapi-dev-app
@@ -176,6 +178,7 @@ workflows:
           aws-access-key-id: Prod_AWS_ACCESS_KEY
           aws-secret-access-key: Prod_AWS_SECRET_ACCESS_KEY
           aws-region: Prod_AWS_DEFAULT_REGION
+          aws-account-id: ${ACCOUNT_ID_PROD}
           codebuild-project-name: AdminAPI-Prod
           codebuild-project-branch: main
           repo-name: adminapi-prod-app
@@ -244,4 +247,3 @@ workflows:
           workspace-path: /tmp/workspace
           requires:
             - deploy_dev
-
