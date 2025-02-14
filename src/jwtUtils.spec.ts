@@ -145,6 +145,14 @@ describe('jwtUtils', () => {
           alg: 'RS256',
           n: 'q8ft1Rs-kUFWlsiGZeZLgc85iNi3dKWQUhAurSfh00q7oltZFam4djkwLMfTJ2mTlobMMXYppilGN_liZkRZg8W3hFxYY_lwGseDvCtiUMXrPDauF4fjCxnc3RNFsaeqfouOsTktBVuwGC2j-aEPVbdyIqppZ3kwkiRRkYioJae4I1Djabzc8Q48VhVbuWDc1-QWpyGHel73mUFVbLPleLqu-4-LrDquaxRDrd65d3CP0LpYwQSzb6bsVvvCB0YSJKCi1top-ZkrVfw_O0toukAJIK-QN7vxcOga_CEraa-J-I9VdEtY0gjsO_70FZ9BNueBMpCJoGbrMQR923YxBQ',
         },
+        {
+          kty: 'RSA',
+          e: 'AQAB',
+          use: 'sig',
+          kid: 'SEMGRL',
+          alg: 'RS256',
+          n: 'sjOK-Rmytt_g8F-9FImGHCKwkPBlgr_DpBTw3Y5esLYTJAqXsQwGtJf2OR4azGcbec5796fE9lhnLEmi6MFz0oBDxhPHwMCyf9DBZhsCVUmAIysosOqeDdxFB_9upCCcYvMpty8hrgoJp9U01ITnYVxRYCSwnJnjJFkxyA2ZXhlMjYwI0W5qo9tUXMwyEnt8408gK_etKrj6A24-oxMpau_gSxSgZDxAi2vpNEapX-hYV0grofnEy25dtHu_5xVVPlDpeQzGWdfRbFQKJKv8km3wvgvv0CsC-CukPZd40kHQiq71a47zNL4OyM-FcGt_KfuZDuFy79g5I8KEFsZOJw',
+        },
       ],
     };
 
@@ -162,7 +170,7 @@ describe('jwtUtils', () => {
           'QtBbT/twDz6JmT99PQkAOB+QBhG4eJvxk8pOr7YzfWU=',
           ...(env === 'development'
             ? ['CMGDEV', 'CORDEV']
-            : ['CURMIG', 'CORPSL']),
+            : ['CURMIG', 'CORPSL', 'SEMGRL']),
         ];
 
         const cognitoMock = nock('https://' + config.auth.cognito.jwtIssuer)
