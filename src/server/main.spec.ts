@@ -4,10 +4,15 @@ import * as jwtUtils from '../jwtUtils';
 
 describe('Context factory function', () => {
   it('multiple invocations only fetch public keys once', async () => {
-    const keySpy = sinon.spy(jwtUtils, 'getSigningKeysFromServer');
+    const keyStub = sinon.stub(jwtUtils, 'getSigningKeysFromServer').resolves({
+      testKID: 'hereisalongkidstring',
+    });
     await contextFactory({ req: { headers: {} } });
     await contextFactory({ req: { headers: {} } });
     await contextFactory({ req: { headers: {} } });
-    expect(keySpy.callCount).toEqual(1);
+
+    expect(keyStub.callCount).toEqual(1);
+
+    keyStub.restore();
   });
 });

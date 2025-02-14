@@ -56,7 +56,7 @@ const config = {
         // you must also specify it here for the environment you want
         process.env.NODE_ENV === 'production'
           ? ['CURMIG', 'CORPSL', 'SEMGRL']
-          : ['CMGDEV', 'CORDEV'],
+          : ['CMGDEV', 'CORDEV', 'SMGRDV'],
     },
     defaultKid:
       // DEFAULT_KID is not set in this repo (or anywhere?)
