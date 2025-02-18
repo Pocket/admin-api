@@ -49,8 +49,10 @@ export async function getAppContext(
 let publicKeys: Record<string, string>;
 
 async function getSigningKeys() {
-  if (publicKeys) return publicKeys;
-  publicKeys = await getSigningKeysFromServer();
+  if (!publicKeys) {
+    publicKeys = await getSigningKeysFromServer();
+  }
+
   return publicKeys;
 }
 

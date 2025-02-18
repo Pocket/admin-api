@@ -26,8 +26,10 @@ const config = {
     //Mozilla Auth Proxy supports a larger number of user groups for a user.
     cognito: {
       jwtIssuer:
+        // COGNITO_JWT_ISSUER is not set in this repo (or anywhere?)
         process.env.COGNITO_JWT_ISSUER ||
         'cognito-idp.us-east-1.amazonaws.com/us-east-1_1alKls4qw',
+      // COGNITO_KIDS is not set in this repo (or anywhere?)
       kids: process.env.COGNITO_KIDS?.split(',') || [
         'kze4M0CiXoDO7Qkpig1oH0F6OInzZg6ugk0PyojOlzc=',
         '4w35mrh4EBECpjJnyIjdQ60yjh3xeI1m0VF1H/z0T/c=',
@@ -35,22 +37,29 @@ const config = {
     },
     mozillaAuthProxy: {
       jwtIssuer:
+        // MOZILLA_AUTH_PROXY_JWT_ISSUER is not set in this repo (or anywhere?)
         process.env.MOZILLA_AUTH_PROXY_JWT_ISSUER ||
         'cognito-idp.us-east-1.amazonaws.com/us-east-1_qYkccPmmu',
+      // MOZILLA_AUTH_PROXY_KIDS is not set in this repo (or anywhere?)
       kids: process.env.MOZILLA_AUTH_PROXY_KIDS?.split(',') || [
         'OR8erz5A8/hCkVdHczk879k2zUQXoAke9p8TQXsgKLQ=',
         'QtBbT/twDz6JmT99PQkAOB+QBhG4eJvxk8pOr7YzfWU=',
       ],
     },
     pocket: {
+      // POCKET_JWT_ISSUER is not set in this repo (or anywhere?)
       jwtIssuer: process.env.POCKET_JWT_ISSUER || 'getpocket.com',
       kids:
+        // POCKET_KIDS is not set in this repo (or anywhere?)
         process.env.POCKET_KIDS?.split(',') ||
+        // if you add a new JWK to https://github.com/Pocket/dotcom-gateway/blob/main/static/.well-known/jwk
+        // you must also specify it here for the environment you want
         process.env.NODE_ENV === 'production'
-          ? ['CURMIG', 'CORPSL']
-          : ['CMGDEV', 'CORDEV'],
+          ? ['CURMIG', 'CORPSL', 'SEMGRL']
+          : ['CMGDEV', 'CORDEV', 'SMGRDV'],
     },
     defaultKid:
+      // DEFAULT_KID is not set in this repo (or anywhere?)
       process.env.DEFAULT_KID || 'OR8erz5A8/hCkVdHczk879k2zUQXoAke9p8TQXsgKLQ=',
   },
 };
