@@ -161,6 +161,22 @@ describe('jwtUtils', () => {
           alg: 'RS256',
           n: 'ja9Fr70SvubM7UFsQKUAHWk86nLCgX3zpUnutqMcfrUfFkWRZ3PQiFuE0UL96ao3RPEuY0eXZaIy3ts0B3YgBo_XUEefbW4V_bRFgsZKJwRvQNUzvYincKxOPQPWqGZqXemqqQFkZguBKiYxBMmhgJytcuFGZ1VfpkttOVGvJS1_Qp2Dp-vimjYaLzTCYTmERsjVXDkWUisMeYY-Sifm4ZdXebVUOs3t4by3mKcdVdoELWjuU_OXlkwREEZACWiA4hVr4PsmaEHF5JDMUaNKb-0pJ0S3YyEUCRy7AYC4GMl24_aHJbKxZEKtsfqYVtWWKSuAg4S7HJmHnIGrliIV9w',
         },
+        {
+          kty: 'RSA',
+          e: 'AQAB',
+          use: 'sig',
+          kid: 'MLMFLO',
+          alg: 'RS256',
+          n: 'snIZKWlCf9Fno9Q1r3AQRzIseCsM_HbJ3EJFriCnKus-VTGExleGSLzylHMuCmUGwYgK7uuqtIfGm8M9gXoH4R6kNW2P7P97chL2K5gjzDYU-djK2IB1-2vIMXZlVNGZbaQKEsNTA4kUaJNv5d4PaXn_m-mWhw7G0gJYO4lqvFba8itvH444Wyymvcc344H27EfN_P7_BXDW-u5QOptvSnhQ0RREwj5PeoxZ8xSTXsBroGU5C24XdYNv8LgdhSVgmMoemUbwCVLrOH2IZQzY-Faa84WqU6f-VJE6bIyCAZ7EsZgVUSuBHoZ4Aul1Vg_UxHNzhoRGtHt2gpd7PUqH5w',
+        },
+        {
+          kty: 'RSA',
+          e: 'AQAB',
+          use: 'sig',
+          kid: 'MLMDEV',
+          alg: 'RS256',
+          n: 'rqv5C78j08K2EcoJUMTIx6r23sHHZv0b2EcDegLplt-K6WLF1PXsuHL-m-hy39houJBoaqQ0IWMmnDT1kDcuMPdiS2BqTsAhE2oSuS-7SlWUH7s_P6gKE1vjyoRg8wTv2SfBTBhHN_QBiIm1UZC3FG27J-uPlJ7d9MSp1Qtlo1KB9AO58gf33-xHSgdh-cstxmW3A-xmbpLgEslcN-rms5_W8YvvcIEKE8_yFSwmciaQRH5g-5J7G-RrwIRc7pYehz3yFyf9Qq44OvFioEiTepJCa39nyYglu3KsCXVB5kb9qCH_S85DT9k1q3eVKfbzEOZnW7B8RocC9XzzoWweRQ',
+        },
       ],
     };
 
@@ -177,8 +193,8 @@ describe('jwtUtils', () => {
           'OR8erz5A8/hCkVdHczk879k2zUQXoAke9p8TQXsgKLQ=',
           'QtBbT/twDz6JmT99PQkAOB+QBhG4eJvxk8pOr7YzfWU=',
           ...(env === 'development'
-            ? ['CMGDEV', 'CORDEV', 'SMGRDV']
-            : ['CURMIG', 'CORPSL', 'SEMGRL']),
+            ? ['CMGDEV', 'CORDEV', 'SMGRDV', 'MLMDEV']
+            : ['CURMIG', 'CORPSL', 'SEMGRL', 'MLMFLO']),
         ];
 
         const cognitoMock = nock('https://' + config.auth.cognito.jwtIssuer)
