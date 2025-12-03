@@ -55,8 +55,8 @@ const config = {
         // if you add a new JWK to https://github.com/Pocket/dotcom-gateway/blob/main/static/.well-known/jwk
         // you must also specify it here for the environment you want
         process.env.NODE_ENV === 'production'
-          ? ['CURMIG', 'CORPSL', 'SEMGRL', 'MLMFLO']
-          : ['CMGDEV', 'CORDEV', 'SMGRDV', 'MLMDEV'],
+          ? ['CURMIG', 'CORPSL', 'SEMGRL', 'MLMFLO', 'PROTRL']
+          : ['CMGDEV', 'CORDEV', 'SMGRDV', 'MLMDEV', 'PTLDEV'],
     },
     defaultKid:
       // DEFAULT_KID is not set in this repo (or anywhere?)
