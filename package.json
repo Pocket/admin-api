@@ -34,7 +34,7 @@
     "jsonwebtoken": "9.0.1",
     "jwks-rsa": "1.12.3",
     "node-fetch": "2.6.12",
-    "qs": "6.11.2"
+    "qs": "6.14.1"
   },
   "devDependencies": {
     "@pocket-tools/eslint-config": "2.1.7",
