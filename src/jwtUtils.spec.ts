@@ -193,6 +193,22 @@ describe('jwtUtils', () => {
           alg: 'RS256',
           n: 'iNM-STUulZNU3nSYb73O3Yg_ABRCKPxblxEmRdgw85hp50vwo28xLjxE5A49lbCMJGPfm1fyhfgNut0O6anIqw6YsBFx0ShnWB0LZR9sn0qE2el2qODQ1WMdYFyRzKrk4qfST4ziOqZ18L9e_o2Q0U8NgtN3tNj9m9oUDRI0gU1RJycCXAMHhYb-_i3rpbuyFGbs0wl4Ze2RA5cea3ImgioOpsmNyAs4oUTIAOWM940lw9L4J2pIBkXzuDBigc7A2VP0tNTTwd4SxJCsRaLH7WC5tXtR69qCOs_c3wNzHDrXXhdDJS1cjhUz7aYebdYBEjerYKr6xV2ExE-0OPkrpQ',
         },
+        {
+          kty: 'RSA',
+          e: 'AQAB',
+          use: 'sig',
+          kid: 'HNTCPP',
+          alg: 'RS256',
+          n: 'sKq1TrCilZ7qHnvZdIbgeTQb18hQeFHP093SPe_Og6Y-A84E9b_YOEBmO3d83fwUOl4qt9amMWr0fZZ_voHWkq1BkHjVIBIYCjDicdiQXxc6EkpcTFvBMeg_3pPs_-dx5MXK0KlcJ6pW_snSqLAGW4ZtC-5gD8cf3eKZbvaptIko7r0UrX4iHggzI69MXyrCdq7Ydua6VjXRQn65Ilk_nIw4XXjwtbB1E_lgtxpwpEwnb3IDkreoYLTkQHPBWR2GkmJi6G4stbN9ODJ_C1_4EaOeHgN0spg2ysL-aDpKfVYbiRS24uv4zkBgBgNh34vmh6x32dCbkDK6hmoLqvv88Q',
+        },
+        {
+          kty: 'RSA',
+          e: 'AQAB',
+          use: 'sig',
+          kid: 'HNTCPN',
+          alg: 'RS256',
+          n: 'r5I0aZ34dtQ63Ri3XcywlaGP10QYTshOmT_lTWfjSaQMQFAVbqW9Zeh8CQMBRECFsJOR6ByTUZerWsLHaz-PqI-iVjnRfDFiRqYdAJJl6qDRLg0mJuhcAzOL6DPyP_u5nSgDgf4cEFCo_E5nEd6KKSBfOvpFOlt8ZK6q9jkoz_Obr4U8-p9FWJJzXk-zuNzZdrg8hAJAJujW-dJycywQ1Y9KU6QotU8IzRPGgxCg2W49i6Kuan7qpchPJDBgQlu4q8WnPvRNxvzApDuMXF82kuLp0ViPQCEgQOMZZgxs0QyW7e7OBI-7nIQwr01QSyA-3GItagI9wBWQkSEC4q0eTw',
+        },
       ],
     };
 
@@ -209,8 +225,8 @@ describe('jwtUtils', () => {
           'OR8erz5A8/hCkVdHczk879k2zUQXoAke9p8TQXsgKLQ=',
           'QtBbT/twDz6JmT99PQkAOB+QBhG4eJvxk8pOr7YzfWU=',
           ...(env === 'development'
-            ? ['CMGDEV', 'CORDEV', 'SMGRDV', 'MLMDEV', 'PTLDEV']
-            : ['CURMIG', 'CORPSL', 'SEMGRL', 'MLMFLO', 'PROTRL']),
+            ? ['CMGDEV', 'CORDEV', 'SMGRDV', 'MLMDEV', 'PTLDEV', 'HNTCPN']
+            : ['CURMIG', 'CORPSL', 'SEMGRL', 'MLMFLO', 'PROTRL', 'HNTCPP']),
         ];
 
         const cognitoMock = nock('https://' + config.auth.cognito.jwtIssuer)
