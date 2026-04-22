@@ -55,26 +55,6 @@ describe('jwtUtils', () => {
       process.env.NODE_ENV = originalNodeEnv;
     });
 
-    const cognitoJwks = {
-      keys: [
-        {
-          alg: 'RS256',
-          e: 'AQAB',
-          kid: 'kze4M0CiXoDO7Qkpig1oH0F6OInzZg6ugk0PyojOlzc=',
-          kty: 'RSA',
-          n: 'uXk44uWZ2tx',
-          use: 'sig',
-        },
-        {
-          alg: 'RS256',
-          e: 'AQAB',
-          kid: '4w35mrh4EBECpjJnyIjdQ60yjh3xeI1m0VF1H/z0T/c=',
-          kty: 'RSA',
-          n: '7LjXOvCWl6Y',
-          use: 'sig',
-        },
-      ],
-    };
     const mozillaAuthProxyJwks = {
       keys: [
         {
@@ -213,15 +193,13 @@ describe('jwtUtils', () => {
     };
 
     it.each(['production', 'development'])(
-      `should get keys from cognito and pocket in %s`,
+      `should get keys from mozilla auth proxy and pocket in %s`,
       async (env) => {
         // Override NODE_ENV and dynamically import getSigningKeysFromServer to re-compute the config in the given env.
         process.env.NODE_ENV = env;
         const { getSigningKeysFromServer } = await import('./jwtUtils');
 
         const expectedKids = [
-          'kze4M0CiXoDO7Qkpig1oH0F6OInzZg6ugk0PyojOlzc=',
-          '4w35mrh4EBECpjJnyIjdQ60yjh3xeI1m0VF1H/z0T/c=',
           'OR8erz5A8/hCkVdHczk879k2zUQXoAke9p8TQXsgKLQ=',
           'QtBbT/twDz6JmT99PQkAOB+QBhG4eJvxk8pOr7YzfWU=',
           ...(env === 'development'
@@ -229,10 +207,6 @@ describe('jwtUtils', () => {
             : ['CURMIG', 'CORPSL', 'SEMGRL', 'MLMFLO', 'PROTRL', 'HNTCPP']),
         ];
 
-        const cognitoMock = nock('https://' + config.auth.cognito.jwtIssuer)
-          .persist()
-          .get('/.well-known/jwks.json')
-          .reply(200, cognitoJwks);
         const mozillaAuthProxyMock = nock(
           'https://' + config.auth.mozillaAuthProxy.jwtIssuer,
         )
@@ -248,7 +222,6 @@ describe('jwtUtils', () => {
 
         expect(Object.keys(keys)).toEqual(expectedKids);
 
-        cognitoMock.persist(false);
         mozillaAuthProxyMock.persist(false);
       },
     );

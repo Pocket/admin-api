@@ -130,17 +130,6 @@ function getJwksClient(jwksUri: string) {
 }
 
 /**
- * Get JWKs from cognito
- */
-function getCognitoJwks() {
-  const jwksUri = `https://${config.auth.cognito.jwtIssuer}/.well-known/jwks.json`;
-  const client = getJwksClient(jwksUri);
-  return config.auth.cognito.kids.map((kid: string) =>
-    client.getSigningKeyAsync(kid),
-  );
-}
-
-/**
  * Get JWKs from mozilla auth proxy
  */
 function getMozillaAuthProxyJwks() {
@@ -170,7 +159,6 @@ export const getSigningKeysFromServer = async (): Promise<
   Record<string, string>
 > => {
   const keys = await Promise.all([
-    ...getCognitoJwks(),
     ...getMozillaAuthProxyJwks(),
     ...getPocketJwks(),
   ]);
