@@ -15,8 +15,10 @@ import {
 import { sentryPlugin } from '@pocket-tools/apollo-utils';
 import { graphqlUploadExpress } from 'graphql-upload';
 
-//Set XRAY to just log if the context is missing instead of a runtime error
-AWSXRay.setContextMissingStrategy('LOG_ERROR');
+// 2026-05-04: Set XRAY to ignore context missing errors
+// AWS logs are flooded with context missing errors, making it difficult to
+// debug other issues.
+AWSXRay.setContextMissingStrategy('IGNORE_ERROR');
 
 //Add the AWS XRAY ECS plugin that will add ecs specific data to the trace
 AWSXRay.config([AWSXRay.plugins.ECSPlugin]);
