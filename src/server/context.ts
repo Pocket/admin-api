@@ -1,9 +1,12 @@
+import * as Sentry from '@sentry/node';
+
 import {
   AdminAPIUser,
   getSigningKeysFromServer,
   validateAndGetAdminAPIUser,
 } from '../jwtUtils';
 import { extractHeader } from './requestHelpers';
+
 export type IContext = {
   publicKeys?: Record<string, string>;
   token?: string;
@@ -18,20 +21,33 @@ export async function getAppContext(
   { req },
   publicKeys: Record<string, string>,
 ): Promise<IContext> {
-  //See if we have an authorization header
+  // See if we have an authorization header
   const token = req.headers.authorization ?? null;
+
+  // if the request doesn't have a JWT, reject it outright
+  if (!token) {
+    // log to ECS
+    console.log('Request is missing JWT');
+    console.log(req);
+
+    Sentry.captureException('Request is missing JWT');
+
+    // throw a generic error if request is missing JWT
+    throw new Error('Internal server error');
+  }
 
   const context: IContext = { token, publicKeys };
 
-  //OH boy! we have an authorization header, lets pull out our JWT and validate it.
-  if (token) {
-    context.token = token.split(' ')[1];
-    //AHH we have a user. Lets put it in our request to use elsewhere.
-    context.adminAPIUser = await validateAndGetAdminAPIUser(
-      context.token,
-      publicKeys,
-    );
-  }
+  // OH boy! we have an authorization header, lets pull out our JWT and validate it.
+  context.token = token.split(' ')[1];
+
+  // AHH we have a user. Lets put it in our request to use elsewhere.
+  // this will throw if the provided JWT is invalid.
+  context.adminAPIUser = await validateAndGetAdminAPIUser(
+    context.token,
+    publicKeys,
+  );
+
   // Add the request headers we want to forward to the subgraphs
   context.forwardHeaders = {
     // We want the originating client, which is the leftmost IP address

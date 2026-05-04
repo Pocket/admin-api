@@ -7,9 +7,23 @@ describe('Context factory function', () => {
     const keyStub = sinon.stub(jwtUtils, 'getSigningKeysFromServer').resolves({
       testKID: 'hereisalongkidstring',
     });
-    await contextFactory({ req: { headers: {} } });
-    await contextFactory({ req: { headers: {} } });
-    await contextFactory({ req: { headers: {} } });
+
+    // mock JWT validation
+    sinon.stub(jwtUtils, 'validateAndGetAdminAPIUser').resolves({
+      name: 'test name',
+      groups: ['test group'],
+      username: 'testUserName',
+    });
+
+    await contextFactory({
+      req: { headers: { authorization: 'Bearer TestRawJWT' } },
+    });
+    await contextFactory({
+      req: { headers: { authorization: 'Bearer TestRawJWT' } },
+    });
+    await contextFactory({
+      req: { headers: { authorization: 'Bearer TestRawJWT' } },
+    });
 
     expect(keyStub.callCount).toEqual(1);
 

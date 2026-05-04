@@ -7,7 +7,7 @@ import jwt, {
 import jwksClient from 'jwks-rsa';
 import { AuthenticationError } from 'apollo-server-errors';
 import config from './config';
-import Sentry from '@sentry/node';
+import * as Sentry from '@sentry/node';
 
 /**
  * Properties of the identity property in CognitoUser below
