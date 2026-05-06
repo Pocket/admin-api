@@ -58,7 +58,9 @@ async function startServer() {
     // enable cross-site request forgery protection
     csrfPrevention: true,
   });
+
   await server.start();
+
   return server;
 }
 
