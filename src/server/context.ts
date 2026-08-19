@@ -1,5 +1,3 @@
-import * as Sentry from '@sentry/node';
-
 import {
   AdminAPIUser,
   getSigningKeysFromServer,
@@ -30,7 +28,9 @@ export async function getAppContext(
     console.log('Request is missing JWT');
     console.log(req);
 
-    Sentry.captureException('Request is missing JWT');
+    // uncomment below if we ever need sentry reporting on missing JWTs
+    // (ideally this gets handled at a higher level - e.g. cloud metrics)
+    // Sentry.captureException('Request is missing JWT');
 
     // throw a generic error if request is missing JWT
     throw new Error('Internal server error');
