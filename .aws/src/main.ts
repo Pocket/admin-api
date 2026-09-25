@@ -66,9 +66,9 @@ class AdminAPI extends TerraformStack {
     //every resource in this stack, which terraform reads as
     //destroy-and-recreate, so fail before anything is planned or applied.
     const PINNED_MODULE_VERSION = '4.6.1';
-    /* eslint-disable-next-line @typescript-eslint/no-var-requires */
-    const installed: string = require('@pocket-tools/terraform-modules/package.json')
-      .version;
+    const installed: string =
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      require('@pocket-tools/terraform-modules/package.json').version;
     if (installed !== PINNED_MODULE_VERSION) {
       throw new Error(
         `@pocket-tools/terraform-modules is ${installed}, but this stack pins ${PINNED_MODULE_VERSION}. ` +
