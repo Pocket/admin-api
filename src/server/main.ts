@@ -64,7 +64,7 @@ async function startServer() {
 const server = startServer();
 // Pass the ApolloGateway to the ApolloServer constructor
 
-const app = express();
+const app: express.Express = express();
 
 // enable file uploads!
 app.use(
