@@ -12,14 +12,13 @@ Due to continued dependence on our Parser service, the Admin API also federates 
 
 ## <a name="starting"></a> Starting the service
 
-Note - after starting the service, you will still need to configure JWT authentication prior to being able to execute any operations through the GraphQL playground. JWT authentication is covered in the next section.
+Note - after starting the service, you will still need to configure JWT authentication prior to being able to execute any operations through Apollo Sandbox. JWT authentication is covered in the next section.
 
 ### Initial setup - Running against dev subgraphs
 
-- Install [docker](https://www.docker.com/) and [rover cli](https://www.apollographql.com/docs/rover/getting-started) if not already configured.
+- Install [rover cli](https://www.apollographql.com/docs/rover/getting-started) if not already configured.
 - Copy `./local-supergraph-config.sample.yaml` to `./local-supergraph-config.yaml` if you haven't already. By default this will connect you to the dev subgraphs.
 - Run `npm ci` to install the project dependencies.
-- Run `docker-compose up` to start the memcache container. Add the `-d` option to run the container in the background
 - Connect to Pocket VPN Dev
 - Run `npm run start:dev` to start the application.
 
@@ -49,21 +48,9 @@ To retrieve your current JWT:
 
 ### Passing your JWT as a header
 
-Once you've retrieved your JWT, open up the GraphQL playground for this servce at http://localhost:4027/. At the bottom of the left-hand panel where you write queries/mutations, click on **HTTP HEADERS** and enter the following:
-
-```
-{
-  "authorization": "Bearer YourVeryLongJWTGoesHere"
-}
-```
+Once you've retrieved your JWT, open up Apollo Sandbox for this service at http://localhost:4027/. In the **Headers** tab below the operation editor, add an `authorization` header with the value `Bearer YourVeryLongJWTGoesHere`.
 
 You should now be able to execute operations with the permissions granted to your Cognito user via Mozillian Groups. For more information on these groups, see our [Shared Data document](https://getpocket.atlassian.net/wiki/spaces/PE/pages/2584150049/Pocket+Shared+Data#Authentication-%26-Authorization).
-
-## Gotchas
-
-- This service uses memcache to cache query and mutation responses. If you are getting the same results when you expect something else, there's a good chance that the response is cached.
-  - The easiest way to get around this is to flush the cache with `echo 'flush_all' | nc localhost 11211`
-  - Restarting the memcache container also works to flush the cache
 
 ## Admin API Schema/Naming Conventions
 

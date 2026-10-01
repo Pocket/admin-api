@@ -2,7 +2,7 @@ import http from 'http';
 import { AddressInfo } from 'net';
 import { buildSchema, graphql, parse } from 'graphql';
 import { composeServices } from '@apollo/composition';
-import { processRequest } from 'graphql-upload';
+import processRequest from 'graphql-upload/processRequest.js';
 import request from 'supertest';
 import sinon from 'sinon';
 import * as jwtUtils from '../jwtUtils';
