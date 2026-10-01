@@ -54,4 +54,6 @@ if (process.env.NODE_ENV === 'local') {
 
 // Initialize an ApolloGateway instance and pass it an array of
 // your implementing service names and URLs
-export const getAppGateway = (): ApolloGateway => new ApolloGateway(options);
+export const getAppGateway = (
+  overrides: Partial<GatewayConfig> = {},
+): ApolloGateway => new ApolloGateway({ ...options, ...overrides });
