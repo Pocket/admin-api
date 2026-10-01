@@ -141,4 +141,24 @@ describe('file uploads', () => {
       base64: bytes.toString('base64'),
     });
   });
+
+  it.each(['__proto__.polluted', 'constructor.prototype.polluted'])(
+    'does not pollute Object.prototype via the upload path %s',
+    async (path) => {
+      const query = `mutation ($data: Upload!) {
+        uploadApprovedCorpusItemImage(data: $data) { filename }
+      }`;
+      const res = await request(app)
+        .post('/')
+        .set('authorization', 'Bearer test-jwt')
+        .set('apollo-require-preflight', 'true')
+        .field('operations', JSON.stringify({ query, variables: { data: {} } }))
+        .field('map', JSON.stringify({ 0: [`variables.data.${path}`] }))
+        .attach('0', Buffer.from('x'), 'x.png');
+
+      // The request reaches the subgraph, so the upload data source ran.
+      expect(res.status).toBe(200);
+      expect(({} as Record<string, unknown>).polluted).toBeUndefined();
+    },
+  );
 });
