@@ -5,9 +5,15 @@ import jwt, {
   TokenExpiredError,
 } from 'jsonwebtoken';
 import jwksClient from 'jwks-rsa';
-import { AuthenticationError } from 'apollo-server-errors';
+import { GraphQLError } from 'graphql';
 import config from './config';
 import * as Sentry from '@sentry/node';
+
+const authenticationError = (message: string): GraphQLError =>
+  new GraphQLError(message, {
+    // 400 matches what Apollo Server 3 returned for AuthenticationError
+    extensions: { code: 'UNAUTHENTICATED', http: { status: 400 } },
+  });
 
 /**
  * Properties of the identity property in CognitoUser below
@@ -66,7 +72,7 @@ export const validateAndGetAdminAPIUser = async (
   // so we cast to a JwtPayload which it is already.
   const payload = decoded.payload as JwtPayload;
   if (!payload.iss) {
-    throw new AuthenticationError(
+    throw authenticationError(
       'The JWT has no issuer defined, unable to verify',
     );
   }
@@ -80,11 +86,11 @@ export const validateAndGetAdminAPIUser = async (
       jwt: rawJwtToken,
     });
     if (err instanceof JsonWebTokenError) {
-      throw new AuthenticationError(`Could not validate User: ${err.message}`);
+      throw authenticationError(`Could not validate User: ${err.message}`);
     } else if (err instanceof TokenExpiredError) {
-      throw new AuthenticationError('Token Expired');
+      throw authenticationError('Token Expired');
     } else if (err instanceof NotBeforeError) {
-      throw new AuthenticationError('Token not yet active');
+      throw authenticationError('Token not yet active');
     } else {
       console.log(err);
       Sentry.captureException(err);
@@ -184,7 +190,7 @@ export const getSigningKeysFromServer = async (): Promise<
 
 /**
  * Decodes a raw JWT string into  Jwt object
- * @throws AuthenticationError if decoded object is null
+ * @throws UNAUTHENTICATED GraphQLError if decoded object is null
  * @param rawJwt raw JWT string
  */
 const decodeDataJwt = (rawJwt: string): jwt.Jwt => {
@@ -193,7 +199,7 @@ const decodeDataJwt = (rawJwt: string): jwt.Jwt => {
   });
 
   if (!decoded) {
-    throw new AuthenticationError('Could not decode JWT');
+    throw authenticationError('Could not decode JWT');
   }
 
   return decoded;

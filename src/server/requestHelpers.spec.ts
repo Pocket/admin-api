@@ -3,12 +3,12 @@ import {
   buildRequestHeadersFromAdminAPIUser,
   extractHeader,
 } from './requestHelpers';
-import { GraphQLRequest } from 'apollo-server-types';
-import { Headers } from 'apollo-server-env';
+import { GraphQLDataSourceProcessOptions } from '@apollo/gateway';
+import { Headers } from 'node-fetch';
 import { AdminAPIUser } from '../jwtUtils';
 
 describe('request helpers', () => {
-  let request: GraphQLRequest;
+  let request: GraphQLDataSourceProcessOptions['request'];
 
   beforeEach(() => {
     request = {

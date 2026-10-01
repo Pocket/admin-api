@@ -1,7 +1,10 @@
-import { GatewayConfig } from '@apollo/gateway';
-import { GraphQLRequest } from 'apollo-server-types';
-import { ApolloGateway } from '@apollo/gateway';
-import FileUploadDataSource from './FileUploadDataSource';
+import {
+  ApolloGateway,
+  GatewayConfig,
+  GraphQLDataSourceProcessOptions,
+} from '@apollo/gateway';
+import FileUploadDataSource from '@profusion/apollo-federation-upload';
+import { Headers } from 'node-fetch';
 import { IContext } from './context';
 import {
   buildRequestHeadersFromAdminAPIUser,
@@ -19,9 +22,13 @@ let options: GatewayConfig = {
         request,
         context,
       }: {
-        request: GraphQLRequest;
+        request: GraphQLDataSourceProcessOptions['request'];
         context: IContext;
       }) {
+        // FileUploadDataSource calls willSendRequest for multipart uploads
+        // before `request.http` exists, and only then reads its headers.
+        request.http ??= { method: 'POST', url, headers: new Headers() };
+
         const { token, adminAPIUser, forwardHeaders } = context;
         // Pass along any headers that should be forwarded to the subgraphs
         addRecordToRequestHeader(forwardHeaders, request);

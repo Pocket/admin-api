@@ -1,5 +1,7 @@
-import { GraphQLRequest } from 'apollo-server-types';
+import { GraphQLDataSourceProcessOptions } from '@apollo/gateway';
 import { AdminAPIUser } from '../jwtUtils';
+
+type GraphQLRequest = GraphQLDataSourceProcessOptions['request'];
 
 /**
  * Extract first value from an http header. If array, first
