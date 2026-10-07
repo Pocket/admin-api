@@ -59,7 +59,7 @@ jobs:
       # Run Linter against code base #
       ################################
       - name: Lint Code Base
-        uses: super-linter/super-linter@v6.0.0  # x-release-please-version
+        uses: super-linter/super-linter@47984f49b4e87383eed97890fe2dca6063bbd9c3  # v8.3.1  # x-release-please-version
 
         # All Environment variables are defined here https://github.com/github/super-linter#environment-variables
         env:
