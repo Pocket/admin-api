@@ -1,6 +1,12 @@
 import { Construct } from 'constructs';
 import { App, S3Backend, TerraformStack } from 'cdktf';
-import { AwsProvider, datasources, kms, sns } from '@cdktf/provider-aws';
+import {
+  AwsProvider,
+  datasources,
+  kms,
+  route53,
+  sns,
+} from '@cdktf/provider-aws';
 import { config } from './config';
 import {
   PocketALBApplication,
@@ -37,7 +43,55 @@ class AdminAPI extends TerraformStack {
       region,
       caller,
     });
+    this.detachDnsManagedByTheWafCutover(pocketApp);
     this.createApplicationCodePipeline(pocketApp);
+  }
+
+  /**
+   * admin-api is served through the Fastly WAF edge (INFRASEC-3068). During
+   * the cutover this service's records were mirrored into the root
+   * getpocket.dev / getpocket.com zone, the per-service sub-zone and its NS
+   * delegation were deleted, and the record for `domain` became a CNAME to the
+   * Fastly edge, maintained outside this stack (SREIN-1800, SREIN-1811).
+   *
+   * The pinned version of terraform-modules has no option for that shape, so
+   * the three affected constructs are detached here and the surviving
+   * certificate validation record is repointed at the root zone. Detaching
+   * them leaves every other resource address in this stack unchanged.
+   * @private
+   */
+  private detachDnsManagedByTheWafCutover(pocketApp: PocketALBApplication) {
+    //This detaches constructs by their internal ids and depends on the
+    //logical ids the pinned version generates. A different version renames
+    //every resource in this stack, which terraform reads as
+    //destroy-and-recreate, so fail before anything is planned or applied.
+    const PINNED_MODULE_VERSION = '4.6.1';
+    const installed: string =
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      require('@pocket-tools/terraform-modules/package.json').version;
+    if (installed !== PINNED_MODULE_VERSION) {
+      throw new Error(
+        `@pocket-tools/terraform-modules is ${installed}, but this stack pins ${PINNED_MODULE_VERSION}. ` +
+          'detachDnsManagedByTheWafCutover relies on the logical ids that version generates, ' +
+          'and a different version renames every resource in this stack. Revisit it before changing the pin.',
+      );
+    }
+
+    //deleted during the cutover; the name is maintained outside this stack
+    pocketApp.baseDNS.node.tryRemoveChild('subhosted_zone');
+    pocketApp.baseDNS.node.tryRemoveChild('subhosted_zone_ns');
+    //without a CDN this is the record for `domain` itself, which is now the
+    //CNAME to the Fastly edge
+    pocketApp.node.tryRemoveChild('alb_record');
+
+    //the ACM validation record survives, but lives in the root zone now
+    const rootZone = pocketApp.node.findChild(
+      'base_dns_main_hosted_zone',
+    ) as route53.DataAwsRoute53Zone;
+    const certificateRecord = pocketApp.node
+      .findChild('alb_certificate')
+      .node.findChild('certificate_record') as route53.Route53Record;
+    certificateRecord.addOverride('zone_id', rootZone.zoneId);
   }
 
   /**
