@@ -43,7 +43,6 @@ class AdminAPI extends TerraformStack {
       region,
       caller,
     });
-    this.detachDnsManagedByTheWafCutover(pocketApp);
     this.createApplicationCodePipeline(pocketApp);
   }
 
@@ -73,7 +72,7 @@ class AdminAPI extends TerraformStack {
       throw new Error(
         `@pocket-tools/terraform-modules is ${installed}, but this stack pins ${PINNED_MODULE_VERSION}. ` +
           'detachDnsManagedByTheWafCutover relies on the logical ids that version generates, ' +
-          'and a different version renames every resource in this stack. Revisit it before changing the pin.',
+          'and a different version renames every resource in this stack. Revisit it before changing the pin.'
       );
     }
 
@@ -86,7 +85,7 @@ class AdminAPI extends TerraformStack {
 
     //the ACM validation record survives, but lives in the root zone now
     const rootZone = pocketApp.node.findChild(
-      'base_dns_main_hosted_zone',
+      'base_dns_main_hosted_zone'
     ) as route53.DataAwsRoute53Zone;
     const certificateRecord = pocketApp.node
       .findChild('alb_certificate')
@@ -282,7 +281,7 @@ class AdminAPI extends TerraformStack {
       },
       autoscalingConfig: {
         targetMinCapacity: 2,
-        targetMaxCapacity: 10,
+        targetMaxCapacity: 11,
       },
       alarms: {
         http5xxErrorPercentage: {
